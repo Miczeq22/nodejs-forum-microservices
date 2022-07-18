@@ -1,1 +1,0 @@
-{"version":3,"file":"register-as-array.js","sourceRoot":"","sources":["../../../src/infrastructure/container/register-as-array.ts"],"names":[],"mappings":";;;AAEO,MAAM,eAAe,GAAG,CAAO,SAA2B,EAAoB,EAAE;IACrF,OAAO;QACL,OAAO,EAAE,CAAC,SAA0B,EAAE,EAAE,CAAC,SAAS,CAAC,GAAG,CAAC,CAAC,QAAQ,EAAE,EAAE,CAAC,SAAS,CAAC,KAAK,CAAC,QAAQ,CAAC,CAAC;KAChG,CAAC;AACJ,CAAC,CAAC;AAJW,QAAA,eAAe,mBAI1B"}
