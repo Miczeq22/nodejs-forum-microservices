@@ -1,3 +1,4 @@
+/// <reference types="jest" />
 export declare const createMockProxy: <Type>(objectName?: string) => { [P in keyof Type]: Type[P] extends (...args: any[]) => any ? jest.MockInstance<ReturnType<Type[P]>, jest.ArgsType<Type[P]>> : Type[P] extends jest.Constructable ? jest.MockedClass<Type[P]> : Type[P]; } & Type & {
     mockClear(): void;
 };

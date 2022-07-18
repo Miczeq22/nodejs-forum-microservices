@@ -1,5 +1,4 @@
 import * as Winston from 'winston';
-import { SeqTransport } from '@datalust/winston-seq';
 
 export interface Logger {
   log: LogMethod;
@@ -38,13 +37,5 @@ export const logger = (serviceName: string): Logger =>
       }),
       logFormat,
     ),
-    transports: [
-      new Winston.transports.Console(),
-      new SeqTransport({
-        level: 'debug',
-        serverUrl: 'http://127.0.0.1:5341',
-        apiKey: 'O8lyxdRwWgOwlWLgvbid',
-        onError: (e) => console.error(e),
-      }),
-    ],
+    transports: [new Winston.transports.Console()],
   });

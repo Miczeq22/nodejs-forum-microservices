@@ -383,6 +383,10 @@
     {
       "packageName": "@myforum/building-blocks",
       "projectFolder": "src/building-blocks"
+    },
+    {
+      "packageName": "@myforum/posts",
+      "projectFolder": "src/services/posts"
     }
   ]
 }
