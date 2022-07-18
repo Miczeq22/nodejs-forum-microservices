@@ -1,0 +1,71 @@
+{
+  "name": "@myforum/building-blocks",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
+    "lint": "eslint --ext .ts \"src/**/*\"",
+    "format": "prettier --write \"src/**/*\""
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "pretty-quick"
+    }
+  },
+  "keywords": [],
+  "author": "Mikołaj Wargowski",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "~16.11.12",
+    "typescript": "~4.5.3",
+    "eslint": "7.32.0",
+    "prettier": "~2.5.1",
+    "husky": "~7.0.4",
+    "pretty-quick": "~3.1.2",
+    "eslint-config-airbnb-typescript": "12.3.1",
+    "@typescript-eslint/eslint-plugin": "~5.6.0",
+    "@typescript-eslint/parser": "~5.6.0",
+    "eslint-config-prettier": "~8.3.0",
+    "eslint-plugin-prettier": "~4.0.0",
+    "eslint-plugin-unicorn": "~39.0.0",
+    "eslint-plugin-import": "2.24.0",
+    "@types/uuid": "~8.3.3",
+    "@types/jest": "~27.0.3",
+    "@types/express": "~4.17.13",
+    "@types/jsonwebtoken": "~8.5.6",
+    "@types/node-schedule": "~1.3.2",
+    "@types/amqplib": "~0.8.2"
+  },
+  "dependencies": {
+    "tsc-alias": "~1.4.2",
+    "uuid": "~8.3.2",
+    "jest": "~27.4.5",
+    "winston": "~3.3.3",
+    "awilix": "~6.0.0",
+    "jsonwebtoken": "~8.5.1",
+    "dotenv": "~10.0.0",
+    "amqplib": "~0.8.0",
+    "@datalust/winston-seq": "~1.0.2",
+    "opentracing": "~0.14.7",
+    "prometheus-api-metrics": "~3.2.1",
+    "prom-client": "~14.0.1",
+    "http-status": "~1.5.1",
+    "express": "~4.17.3",
+    "mongoose": "~6.3.1",
+    "redis": "~4.0.6",
+    "@opentelemetry/api": "~1.0.4",
+    "@opentelemetry/sdk-node": "~0.27.0",
+    "@opentelemetry/auto-instrumentations-node": "~0.28.0",
+    "@opentelemetry/sdk-trace-node": "~1.0.1",
+    "@opentelemetry/resources": "~1.0.1",
+    "@opentelemetry/semantic-conventions": "~1.0.1",
+    "@opentelemetry/sdk-trace-base": "~1.0.1",
+    "@opentelemetry/exporter-jaeger": "~1.0.1",
+    "@opentelemetry/shim-opentracing": "~1.0.1",
+    "@opentelemetry/instrumentation": "~0.27.0",
+    "@opentelemetry/instrumentation-fetch": "~0.27.0",
+    "@opentelemetry/instrumentation-http": "~0.27.0",
+    "node-fetch": "2"
+  }
+}

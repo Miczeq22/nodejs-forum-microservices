@@ -1,0 +1,14 @@
+{
+  "folders": [
+    {
+      "path": ".",
+      "name": "root"
+    },
+    {
+      "path": "src/api-gateway"
+    },
+    {
+      "path": "src/building-blocks"
+    }
+  ]
+}
