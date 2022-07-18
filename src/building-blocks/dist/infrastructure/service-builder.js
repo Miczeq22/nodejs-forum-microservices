@@ -29,7 +29,6 @@ const logger_1 = require("./logger");
 const message_bus_1 = require("./message-bus");
 const tracer_1 = require("./tracer");
 const service_discovery_1 = require("./service-discovery");
-const redis_service_client_1 = require("./service-client/redis.service-client");
 const token_provider_1 = require("./token-provider");
 class ServiceBuilder {
     constructor() {
@@ -39,7 +38,6 @@ class ServiceBuilder {
         this.serviceName = name;
         this.container.register({
             logger: (0, awilix_1.asValue)((0, logger_1.logger)(name)),
-            serviceClient: (0, awilix_1.asClass)(redis_service_client_1.RedisServiceClient).singleton(),
             tokenProvider: (0, awilix_1.asClass)(token_provider_1.JwtTokenProviderService).singleton(),
         });
         const tracerBuilder = new tracer_1.TracerBuilder(name).build();
@@ -126,15 +124,15 @@ class ServiceBuilder {
             bootstrap: async () => {
                 var _a;
                 const resolvedLogger = this.container.resolve('logger');
-                const serviceClient = this.container.resolve('serviceClient');
                 this.registerCommonDependenciesIfNotSet();
-                await serviceClient.bootstrap();
                 resolvedLogger.info('Loading service dependencies...');
                 this.container.register({
                     server: (0, awilix_1.asClass)(server_1.Server).singleton(),
                 });
-                const messageBus = this.container.resolve('messageBus');
-                await messageBus.init();
+                if (this.container.hasRegistration('messageBus')) {
+                    const messageBus = this.container.resolve('messageBus');
+                    await messageBus.init();
+                }
                 this.registerEventSubscribers();
                 const server = this.container.resolve('server');
                 this.container.register({
@@ -161,18 +159,20 @@ class ServiceBuilder {
     }
     async listen(port) {
         const app = this.container.resolve('app');
-        const serviceDiscovery = this.container.resolve('serviceDiscovery');
         const resolvedLogger = this.container.resolve('logger');
-        await serviceDiscovery.registerService({
-            port,
-            address: '127.0.0.1',
-            name: this.serviceName,
-            health: {
-                endpoint: '/health',
-                intervalSeconds: 10,
-                timeoutSeconds: 1,
-            },
-        });
+        if (this.container.hasRegistration('serviceDiscovery')) {
+            const serviceDiscovery = this.container.resolve('serviceDiscovery');
+            await serviceDiscovery.registerService({
+                port,
+                address: '127.0.0.1',
+                name: this.serviceName,
+                health: {
+                    endpoint: '/health',
+                    intervalSeconds: 10,
+                    timeoutSeconds: 1,
+                },
+            });
+        }
         app.listen(port, async () => {
             resolvedLogger.info(`Service started listening on http://localhost:${port}`, {
                 port,
@@ -180,6 +180,9 @@ class ServiceBuilder {
         });
     }
     async registerEventSubscribers() {
+        if (!this.container.hasRegistration('messageBus')) {
+            return;
+        }
         const subscribers = this.container.resolve('subscribers');
         const messageBus = this.container.resolve('messageBus');
         const promises = subscribers.map((subscriber) => {

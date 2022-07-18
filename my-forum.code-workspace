@@ -9,6 +9,9 @@
     },
     {
       "path": "src/building-blocks"
+    },
+    {
+      "path": "src/services/posts"
     }
   ]
 }

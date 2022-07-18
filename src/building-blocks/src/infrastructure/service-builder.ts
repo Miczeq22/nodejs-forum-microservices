@@ -25,8 +25,6 @@ import { Logger, logger } from './logger';
 import { MessageBus, RabbitMqMessageBus } from './message-bus';
 import { TracerBuilder } from './tracer';
 import { ConsulServiceDiscovery, ServiceDiscovery } from './service-discovery';
-import { RedisServiceClient } from './service-client/redis.service-client';
-import { ServiceClient } from './service-client/service-client';
 import { JwtTokenProviderService } from './token-provider';
 
 interface CustomResolution {
@@ -43,7 +41,6 @@ export class ServiceBuilder {
 
     this.container.register({
       logger: asValue(logger(name)),
-      serviceClient: asClass(RedisServiceClient).singleton(),
       tokenProvider: asClass(JwtTokenProviderService).singleton(),
     });
 
@@ -154,11 +151,8 @@ export class ServiceBuilder {
     return {
       bootstrap: async () => {
         const resolvedLogger = this.container.resolve<Logger>('logger');
-        const serviceClient = this.container.resolve<ServiceClient>('serviceClient');
 
         this.registerCommonDependenciesIfNotSet();
-
-        await serviceClient.bootstrap();
 
         resolvedLogger.info('Loading service dependencies...');
 
@@ -166,9 +160,11 @@ export class ServiceBuilder {
           server: asClass(Server).singleton(),
         });
 
-        const messageBus = this.container.resolve<MessageBus>('messageBus');
+        if (this.container.hasRegistration('messageBus')) {
+          const messageBus = this.container.resolve<MessageBus>('messageBus');
 
-        await messageBus.init();
+          await messageBus.init();
+        }
 
         this.registerEventSubscribers();
 
@@ -206,19 +202,22 @@ export class ServiceBuilder {
   public async listen(port: number) {
     const app = this.container.resolve<Application>('app');
 
-    const serviceDiscovery = this.container.resolve<ServiceDiscovery>('serviceDiscovery');
     const resolvedLogger = this.container.resolve<Logger>('logger');
 
-    await serviceDiscovery.registerService({
-      port,
-      address: '127.0.0.1',
-      name: this.serviceName,
-      health: {
-        endpoint: '/health',
-        intervalSeconds: 10,
-        timeoutSeconds: 1,
-      },
-    });
+    if (this.container.hasRegistration('serviceDiscovery')) {
+      const serviceDiscovery = this.container.resolve<ServiceDiscovery>('serviceDiscovery');
+
+      await serviceDiscovery.registerService({
+        port,
+        address: '127.0.0.1',
+        name: this.serviceName,
+        health: {
+          endpoint: '/health',
+          intervalSeconds: 10,
+          timeoutSeconds: 1,
+        },
+      });
+    }
 
     app.listen(port, async () => {
       resolvedLogger.info(`Service started listening on http://localhost:${port}`, {
@@ -228,6 +227,10 @@ export class ServiceBuilder {
   }
 
   private async registerEventSubscribers() {
+    if (!this.container.hasRegistration('messageBus')) {
+      return;
+    }
+
     const subscribers = this.container.resolve<EventSubscriber<any>[]>('subscribers');
     const messageBus = this.container.resolve<MessageBus>('messageBus');
 

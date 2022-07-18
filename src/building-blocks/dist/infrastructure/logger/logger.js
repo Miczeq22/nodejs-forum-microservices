@@ -21,7 +21,6 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.logger = void 0;
 const Winston = __importStar(require("winston"));
-const winston_seq_1 = require("@datalust/winston-seq");
 const logFormat = Winston.format.printf(({ level, message, service, timestamp }) => `${service}:  ${timestamp} | [${level}]: ${message}`);
 const logger = (serviceName) => {
     var _a;
@@ -37,15 +36,7 @@ const logger = (serviceName) => {
         }), Winston.format.timestamp({
             format: 'YYYY-MM-DD HH:mm:ss',
         }), logFormat),
-        transports: [
-            new Winston.transports.Console(),
-            new winston_seq_1.SeqTransport({
-                level: 'debug',
-                serverUrl: 'http://127.0.0.1:5341',
-                apiKey: 'O8lyxdRwWgOwlWLgvbid',
-                onError: (e) => console.error(e),
-            }),
-        ],
+        transports: [new Winston.transports.Console()],
     });
 };
 exports.logger = logger;
