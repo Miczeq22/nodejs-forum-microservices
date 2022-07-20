@@ -26,6 +26,7 @@ import { MessageBus, RabbitMqMessageBus } from './message-bus';
 import { TracerBuilder } from './tracer';
 import { ConsulServiceDiscovery, ServiceDiscovery } from './service-discovery';
 import { JwtTokenProviderService } from './token-provider';
+import { KafkaMessageBroker } from './message-broker/kafka/kafka.message-broker';
 
 interface CustomResolution {
   [key: string]: Resolver<any>;
@@ -105,12 +106,20 @@ export class ServiceBuilder {
   }
 
   public setEventSubscribers(eventSubscribers: Resolver<EventSubscriber<any>>[]) {
-    if (!this.container.hasRegistration('messageBus')) {
-      throw new Error("Can't subscribe to command. Message Bus is not set.");
-    }
-
     this.container.register({
-      subscribers: registerAsArray(eventSubscribers),
+      eventSubscribers: registerAsArray(eventSubscribers),
+    });
+
+    return this;
+  }
+
+  public useKafka() {
+    this.container.register({
+      messageBroker: asClass(KafkaMessageBroker)
+        .inject(() => ({
+          url: 'localhost:9092',
+        }))
+        .singleton(),
     });
 
     return this;
@@ -165,8 +174,6 @@ export class ServiceBuilder {
 
           await messageBus.init();
         }
-
-        this.registerEventSubscribers();
 
         const server = this.container.resolve<Server>('server');
 
@@ -224,24 +231,6 @@ export class ServiceBuilder {
         port,
       });
     });
-  }
-
-  private async registerEventSubscribers() {
-    if (!this.container.hasRegistration('messageBus')) {
-      return;
-    }
-
-    const subscribers = this.container.resolve<EventSubscriber<any>[]>('subscribers');
-    const messageBus = this.container.resolve<MessageBus>('messageBus');
-
-    const promises = subscribers.map((subscriber) => {
-      const [service, ...rest] = subscriber.type.split('.');
-
-      return messageBus.subscribeToEvent(rest.join('.'), service, (event, ctx) =>
-        subscriber.handle(event, ctx),
-      );
-    });
-    await Promise.all(promises);
   }
 
   private registerCommonDependenciesIfNotSet() {

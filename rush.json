@@ -387,6 +387,10 @@
     {
       "packageName": "@myforum/posts",
       "projectFolder": "src/services/posts"
+    },
+    {
+      "packageName": "@myforum/users",
+      "projectFolder": "src/services/users"
     }
   ]
 }

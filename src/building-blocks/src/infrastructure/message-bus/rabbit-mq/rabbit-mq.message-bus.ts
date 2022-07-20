@@ -47,7 +47,7 @@ export class RabbitMqMessageBus implements MessageBus {
 
     this.channel.publish(
       this.dependencies.serviceName,
-      `${event.service}.${event.constructor.name}.${event.service}`,
+      `${event.constructor.name}`,
       Buffer.from(JSON.stringify({ payload: event.payload, context })),
     );
 
@@ -87,7 +87,7 @@ export class RabbitMqMessageBus implements MessageBus {
           'x-type': 'event',
         });
 
-        await callback(new DomainEvent(service, payload), context);
+        await callback(new DomainEvent(payload), context);
 
         span.finish();
 
