@@ -1,7 +1,7 @@
 import { Tracer } from 'opentracing';
 import { NotFoundError, Logger } from '..';
 import { Command } from './command';
-import { CommandBus, CommandContext } from './command-bus';
+import { CommandBus } from './command-bus';
 import { CommandHandler } from './command-handler';
 
 interface CommandHandlers {
@@ -29,42 +29,25 @@ export class InMemoryCommandBus implements CommandBus {
     );
   }
 
-  public async handle(command: Command<any>, { context }: CommandContext): Promise<unknown> {
-    const { tracer, logger } = this.dependencies;
-
-    const span = tracer.startSpan(
-      `[Command Bus] Handling command${command.constructor.name.replace(/([A-Z])/g, ' $1')}.`,
-      {
-        childOf: context,
-      },
-    );
-
-    span.addTags({
-      'x-type': 'command',
-    });
+  public async handle(command: Command<any>): Promise<unknown> {
+    const { logger } = this.dependencies;
 
     const existingCommandHandler =
       this.existingCommandHandlers[this.getCommandHandlerName(command)];
 
     if (!existingCommandHandler) {
-      span.finish();
-
       throw new NotFoundError(
         `Command Handler for command: "${this.getConstructorName(command)}" does not exist.`,
       );
     }
 
     try {
-      const result = await existingCommandHandler.handle(command, {
-        spanContext: span.context(),
-      });
+      const result = await existingCommandHandler.handle(command);
 
       return result;
     } catch (error) {
       logger.error(`[Command Bus] Can't process command: ${command.constructor.name}.`, error);
       throw error;
-    } finally {
-      span.finish();
     }
   }
 

@@ -10,5 +10,5 @@ export interface CommandHandler<
   CommandType extends Command<any> | ServiceCommand<any>,
   ResultType extends object | void = void,
 > {
-  handle(command: CommandType, context: CommandHandlerContext): Promise<ResultType>;
+  handle(command: CommandType): Promise<ResultType>;
 }

@@ -4,7 +4,7 @@ export interface AuthorProps {
   status: AuthorStatus;
 }
 
-export interface PersistedAuthor {
+export interface RawAuthor {
   id: string;
   status: string;
 }
