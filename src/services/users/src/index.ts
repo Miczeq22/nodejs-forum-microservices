@@ -5,11 +5,7 @@ interface Payload {
   name: string;
 }
 
-class UserRegisteredEvent extends DomainEvent<Payload> {
-  constructor(payload: Payload) {
-    super(payload);
-  }
-}
+class UserRegisteredEvent extends DomainEvent<Payload> {}
 
 (async () => {
   const service = new ServiceBuilder().setName('users').useKafka().build();

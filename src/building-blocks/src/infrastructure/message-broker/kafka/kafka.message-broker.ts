@@ -8,12 +8,13 @@ interface Dependencies {
   url: string;
   eventSubscribers: EventSubscriber<any>[];
   logger: Logger;
+  serviceName: string;
 }
 
 export class KafkaMessageBroker implements MessageBroker {
   private client: Kafka.KafkaClient;
 
-  private consumers = new Map<string, Kafka.Consumer>();
+  private consumers = new Map<string, Kafka.ConsumerGroup>();
 
   private producers = new Map<string, Kafka.Producer>();
 
@@ -42,9 +43,7 @@ export class KafkaMessageBroker implements MessageBroker {
 
   public async sendMessage(topic: string, event: DomainEvent<void>, key: string): Promise<void> {
     if (!this.producers.has(topic)) {
-      const producer = new Kafka.Producer(this.client, {
-        requireAcks: 1,
-      });
+      const producer = new Kafka.Producer(this.client);
 
       this.producers.set(topic, producer);
     }
@@ -75,16 +74,12 @@ export class KafkaMessageBroker implements MessageBroker {
 
   private subscribeToTopic(topic: string) {
     if (!this.consumers.has(topic)) {
-      const consumer = new Kafka.Consumer(
-        this.client,
-        [
-          {
-            topic,
-          },
-        ],
+      const consumer = new Kafka.ConsumerGroup(
         {
-          autoCommit: true,
+          kafkaHost: this.dependencies.url,
+          groupId: this.dependencies.serviceName,
         },
+        [topic],
       );
 
       this.consumers.set(topic, consumer);

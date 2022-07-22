@@ -118,6 +118,7 @@ export class ServiceBuilder {
       messageBroker: asClass(KafkaMessageBroker)
         .inject(() => ({
           url: 'localhost:9092',
+          serviceName: this.serviceName,
         }))
         .singleton(),
     });
