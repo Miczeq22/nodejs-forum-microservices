@@ -1,3 +1,8 @@
+import { PostsManagementController } from '@api/posts-management/posts-management.controller';
+import { CreateNewPostCommandHandler } from '@app/commands/create-new-post/create-new-post.command-handler';
+import { InMemoryAuthorProvider } from '@infrastructure/author-provider/author-provider.service';
+import { InMemoryCategoryProvider } from '@infrastructure/category-provider/category-provider.service';
+import { InMemoryPostRepository } from '@infrastructure/post/post.repository';
 import { MessageBroker, ServiceBuilder, EventSubscriber, Logger } from '@myforum/building-blocks';
 import { asClass } from 'awilix';
 
@@ -18,7 +23,15 @@ class UserRegisteredSubscriber implements EventSubscriber<any> {
 (async () => {
   const service = new ServiceBuilder()
     .setName('posts')
+    .loadActions([`${__dirname}/**/*.action.ts`, `${__dirname}/**/*.action.js`])
     .setEventSubscribers([asClass(UserRegisteredSubscriber).singleton()])
+    .setCommandHandlers([asClass(CreateNewPostCommandHandler).singleton()])
+    .setControllers([asClass(PostsManagementController).singleton()])
+    .setCustom({
+      authorProvider: asClass(InMemoryAuthorProvider).singleton(),
+      categoryProvider: asClass(InMemoryCategoryProvider).singleton(),
+      postRepository: asClass(InMemoryPostRepository).singleton(),
+    })
     .useKafka()
     .build();
 
