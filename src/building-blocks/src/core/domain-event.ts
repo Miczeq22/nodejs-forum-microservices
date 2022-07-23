@@ -1,3 +1,3 @@
-export class DomainEvent<PayloadType extends object | void = void> {
+export class DomainEvent<PayloadType extends object = {}> {
   constructor(public readonly payload: PayloadType) {}
 }

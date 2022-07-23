@@ -6,5 +6,5 @@ export interface QueryContext {
 }
 
 export interface QueryBus {
-  handle(query: Query<any>, context: QueryContext): Promise<unknown>;
+  handle(query: Query<any>): Promise<unknown>;
 }

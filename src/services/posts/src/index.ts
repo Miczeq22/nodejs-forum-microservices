@@ -1,5 +1,7 @@
+import { PostCatalogueController } from '@api/post-catalogue/post-catalogue.controller';
 import { PostsManagementController } from '@api/posts-management/posts-management.controller';
 import { CreateNewPostCommandHandler } from '@app/commands/create-new-post/create-new-post.command-handler';
+import { GetAllPostsQueryHandler } from '@app/queries/get-all-posts/get-all-posts.query-handler';
 import { InMemoryAuthorProvider } from '@infrastructure/author-provider/author-provider.service';
 import { InMemoryCategoryProvider } from '@infrastructure/category-provider/category-provider.service';
 import { InMemoryPostRepository } from '@infrastructure/post/post.repository';
@@ -26,7 +28,11 @@ class UserRegisteredSubscriber implements EventSubscriber<any> {
     .loadActions([`${__dirname}/**/*.action.ts`, `${__dirname}/**/*.action.js`])
     .setEventSubscribers([asClass(UserRegisteredSubscriber).singleton()])
     .setCommandHandlers([asClass(CreateNewPostCommandHandler).singleton()])
-    .setControllers([asClass(PostsManagementController).singleton()])
+    .setQueryHandlers([asClass(GetAllPostsQueryHandler).singleton()])
+    .setControllers([
+      asClass(PostsManagementController).singleton(),
+      asClass(PostCatalogueController).singleton(),
+    ])
     .setCustom({
       authorProvider: asClass(InMemoryAuthorProvider).singleton(),
       categoryProvider: asClass(InMemoryCategoryProvider).singleton(),
@@ -44,4 +50,8 @@ class UserRegisteredSubscriber implements EventSubscriber<any> {
   const messageBroker = service.getContainer().resolve<MessageBroker>('messageBroker');
 
   await messageBroker.subscribeToTopics(['users']);
+
+  service.cleanUpOnExit(async () => {
+    await messageBroker.disconnect();
+  });
 })();

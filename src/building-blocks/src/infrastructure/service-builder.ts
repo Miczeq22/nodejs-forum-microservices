@@ -204,6 +204,9 @@ export class ServiceBuilder {
       getContainer: () => {
         return this.container;
       },
+      cleanUpOnExit: (cleanUpCallback: () => Promise<void>) => {
+        this.cleanUpOnExit(cleanUpCallback);
+      },
     };
   }
 
@@ -232,6 +235,32 @@ export class ServiceBuilder {
         port,
       });
     });
+  }
+
+  private cleanUpOnExit(cleanup: () => Promise<void>) {
+    // so the program will not close instantly
+    process.stdin.resume();
+
+    async function exitHandler(options, _exitCode) {
+      if (options.cleanup || options.exit) {
+        await cleanup();
+      }
+
+      if (options.exit) process.exit();
+    }
+
+    // do something when app is closing
+    process.on('exit', exitHandler.bind(null, { cleanup: true }));
+
+    // catches ctrl+c event
+    process.on('SIGINT', exitHandler.bind(null, { exit: true }));
+
+    // catches "kill pid" (for example: nodemon restart)
+    process.on('SIGUSR1', exitHandler.bind(null, { exit: true }));
+    process.on('SIGUSR2', exitHandler.bind(null, { exit: true }));
+
+    // catches uncaught exceptions
+    process.on('uncaughtException', exitHandler.bind(null, { exit: true }));
   }
 
   private registerCommonDependenciesIfNotSet() {

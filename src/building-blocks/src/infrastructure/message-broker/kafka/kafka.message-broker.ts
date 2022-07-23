@@ -41,7 +41,7 @@ export class KafkaMessageBroker implements MessageBroker {
     topics.forEach(this.subscribeToTopic.bind(this));
   }
 
-  public async sendMessage(topic: string, event: DomainEvent<void>, key: string): Promise<void> {
+  public async sendMessage(topic: string, event: DomainEvent<object>, key: string): Promise<void> {
     if (!this.producers.has(topic)) {
       const producer = new Kafka.Producer(this.client);
 
@@ -70,6 +70,20 @@ export class KafkaMessageBroker implements MessageBroker {
         }
       },
     );
+  }
+
+  public async disconnect(): Promise<void> {
+    this.consumers.forEach((consumer) =>
+      consumer.close((error) => {
+        if (error) {
+          this.dependencies.logger.error('Error occured while consumer close connection', error);
+        }
+      }),
+    );
+
+    this.producers.forEach((producer) => producer.close());
+
+    this.client.close();
   }
 
   private subscribeToTopic(topic: string) {

@@ -1,7 +1,6 @@
-import { Tracer } from 'opentracing';
 import { NotFoundError } from '..';
 import { Query } from './query';
-import { QueryBus, QueryContext } from './query-bus';
+import { QueryBus } from './query-bus';
 import { QueryHandler } from './query-handler';
 
 interface QueryHandlers {
@@ -10,13 +9,12 @@ interface QueryHandlers {
 
 interface Dependencies {
   queryHandlers: QueryHandler<any, any>[];
-  tracer: Tracer;
 }
 
 export class InMemoryQueryBus implements QueryBus {
   private existingQueryHandlers: QueryHandlers = {};
 
-  constructor(private readonly dependencies: Dependencies) {
+  constructor(dependencies: Dependencies) {
     this.existingQueryHandlers = dependencies.queryHandlers.reduce(
       (queryHandlers: QueryHandlers, currentHandler: QueryHandler<any, any>) => {
         return {
@@ -28,33 +26,16 @@ export class InMemoryQueryBus implements QueryBus {
     );
   }
 
-  public async handle(query: Query<any>, { context }: QueryContext): Promise<unknown> {
-    const { tracer } = this.dependencies;
-
-    const span = tracer.startSpan(
-      `[Query Bus] Handling query${query.constructor.name.replace(/([A-Z])/g, ' $1')}`,
-      {
-        childOf: context,
-      },
-    );
-
-    span.addTags({
-      'x-type': 'query',
-    });
-
+  public async handle(query: Query<any>): Promise<unknown> {
     const existingQueryHandler = this.existingQueryHandlers[this.getQueryHandlerName(query)];
 
     if (!existingQueryHandler) {
-      span.finish();
-
       throw new NotFoundError(
         `Query Handler for query: "${this.getConstructorName(query)}" does not exist.`,
       );
     }
 
     const result = await existingQueryHandler.handle(query);
-
-    span.finish();
 
     return result;
   }
