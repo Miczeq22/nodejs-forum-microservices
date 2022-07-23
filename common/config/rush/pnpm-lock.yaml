@@ -26,7 +26,6 @@ specifiers:
   '@types/jsonwebtoken': ~8.5.6
   '@types/node': ~16.11.12
   '@types/node-schedule': ~1.3.2
-  '@types/uuid': ~8.3.3
   '@typescript-eslint/eslint-plugin': ~5.6.0
   '@typescript-eslint/parser': ~5.6.0
   amqplib: ~0.8.0
@@ -91,7 +90,6 @@ dependencies:
   '@types/jsonwebtoken': 8.5.8
   '@types/node': 16.11.45
   '@types/node-schedule': 1.3.2
-  '@types/uuid': 8.3.4
   '@typescript-eslint/eslint-plugin': 5.6.0_208b89671cba43a6bd6c40399b91183c
   '@typescript-eslint/parser': 5.6.0_eslint@7.32.0+typescript@4.5.5
   amqplib: 0.8.0
@@ -7690,7 +7688,7 @@ packages:
     dev: false
 
   file:projects/posts.tgz:
-    resolution: {integrity: sha512-XoF+Bp5kVzOHQrOkjEBxsI9WfH3YeM+w5Uw3p06bbqAnLsnWS0LjG93lLJEJR3gosgp6f9ZuuyY6340wnPRxlg==, tarball: file:projects/posts.tgz}
+    resolution: {integrity: sha512-uu6KVAV88vhLglMXJ/P6vuBrqaHkbOIjUYLhBk3zq0kCJFsH1nBFPzQpPicBMIEK+tk9GkjlWXmqLUuh7AvRLA==, tarball: file:projects/posts.tgz}
     name: '@rush-temp/posts'
     version: 0.0.0
     dependencies:
@@ -7718,6 +7716,7 @@ packages:
       '@typescript-eslint/parser': 5.6.0_eslint@7.32.0+typescript@4.5.5
       amqplib: 0.8.0
       awilix: 6.0.0
+      celebrate: 15.0.1
       dotenv: 10.0.0
       eslint: 7.32.0
       eslint-config-airbnb-typescript: 12.3.1_c27c76bc318784551b1ca1bf0c09dfe8
