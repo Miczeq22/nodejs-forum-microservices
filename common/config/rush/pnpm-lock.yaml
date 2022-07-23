@@ -15,6 +15,7 @@ specifiers:
   '@opentelemetry/semantic-conventions': ~1.0.1
   '@opentelemetry/shim-opentracing': ~1.0.1
   '@rush-temp/building-blocks': file:./projects/building-blocks.tgz
+  '@rush-temp/notifications': file:./projects/notifications.tgz
   '@rush-temp/posts': file:./projects/posts.tgz
   '@rush-temp/users': file:./projects/users.tgz
   '@types/amqplib': ~0.8.2
@@ -27,6 +28,7 @@ specifiers:
   '@types/jsonwebtoken': ~8.5.6
   '@types/node': ~16.11.12
   '@types/node-schedule': ~1.3.2
+  '@types/nodemailer': ~6.4.4
   '@typescript-eslint/eslint-plugin': ~5.6.0
   '@typescript-eslint/parser': ~5.6.0
   amqplib: ~0.8.0
@@ -53,6 +55,8 @@ specifiers:
   mongoose: ~6.3.1
   node-fetch: '2'
   node-schedule: ~2.1.0
+  nodemailer: ~6.7.7
+  nodemailer-express-handlebars: ~5.0.0
   nodemon: ~2.0.19
   opentracing: ~0.14.7
   prettier: ~2.5.1
@@ -81,6 +85,7 @@ dependencies:
   '@opentelemetry/semantic-conventions': 1.0.1
   '@opentelemetry/shim-opentracing': 1.0.1_@opentelemetry+api@1.0.4
   '@rush-temp/building-blocks': file:projects/building-blocks.tgz_ts-node@10.9.1
+  '@rush-temp/notifications': file:projects/notifications.tgz
   '@rush-temp/posts': file:projects/posts.tgz
   '@rush-temp/users': file:projects/users.tgz
   '@types/amqplib': 0.8.2
@@ -93,6 +98,7 @@ dependencies:
   '@types/jsonwebtoken': 8.5.8
   '@types/node': 16.11.45
   '@types/node-schedule': 1.3.2
+  '@types/nodemailer': 6.4.4
   '@typescript-eslint/eslint-plugin': 5.6.0_208b89671cba43a6bd6c40399b91183c
   '@typescript-eslint/parser': 5.6.0_eslint@7.32.0+typescript@4.5.5
   amqplib: 0.8.0
@@ -119,6 +125,8 @@ dependencies:
   mongoose: 6.3.9
   node-fetch: 2.6.7
   node-schedule: 2.1.0
+  nodemailer: 6.7.7
+  nodemailer-express-handlebars: 5.0.0
   nodemon: 2.0.19
   opentracing: 0.14.7
   prettier: 2.5.1
@@ -1804,6 +1812,10 @@ packages:
       '@types/express': 4.17.13
     dev: false
 
+  /@types/express-handlebars/5.3.1:
+    resolution: {integrity: sha512-DSzaERLO4gHb8AqnrL58jzSDyT0yDdl6HqDc+bGz1Hf0nrG1FK30nHGzv8NBEGR8QV9eUGB/YaE0Qj3NjF7siw==}
+    dev: false
+
   /@types/express-serve-static-core/4.17.29:
     resolution: {integrity: sha512-uMd++6dMKS32EOuw1Uli3e3BPgdLIXmezcfHv7N4c1s3gkhikBplORPpMq3fuWkxncZN1reb16d5n8yhQ80x7Q==}
     dependencies:
@@ -2000,6 +2012,19 @@ packages:
 
   /@types/node/16.11.45:
     resolution: {integrity: sha512-3rKg/L5x0rofKuuUt5zlXzOnKyIHXmIu5R8A0TuNDMF2062/AOIDBciFIjToLEJ/9F9DzkHNot+BpNsMI1OLdQ==}
+    dev: false
+
+  /@types/nodemailer-express-handlebars/4.0.2:
+    resolution: {integrity: sha512-LnKnqgl6C3osQKQDcIxB6P4iS2Iixq+p0ZCC93pzhSRLvo4PgGHmrTFE38ZGrFxc/DyZefYGEsYHSblxJtwuxw==}
+    dependencies:
+      '@types/express-handlebars': 5.3.1
+      '@types/nodemailer': 6.4.4
+    dev: false
+
+  /@types/nodemailer/6.4.4:
+    resolution: {integrity: sha512-Ksw4t7iliXeYGvIQcSIgWQ5BLuC/mljIEbjf615svhZL10PE9t+ei8O9gDaD3FPCasUJn9KTLwz2JFJyiiyuqw==}
+    dependencies:
+      '@types/node': 16.11.45
     dev: false
 
   /@types/normalize-package-data/2.4.1:
@@ -2692,6 +2717,12 @@ packages:
     dependencies:
       balanced-match: 1.0.2
       concat-map: 0.0.1
+    dev: false
+
+  /brace-expansion/2.0.1:
+    resolution: {integrity: sha512-XnAIvQ8eM+kC6aULx6wuQiwVsnzsi9d3WxzV3FpWTGA19F621kwdbsAcFKXgKUHZWsy+mY6iL1sHTxWEFCytDA==}
+    dependencies:
+      balanced-match: 1.0.2
     dev: false
 
   /braces/3.0.2:
@@ -3768,6 +3799,15 @@ packages:
     resolution: {integrity: sha512-s2p9nh2Q2++9XAqZqyCORk7KQTfrfKqB/Y5A4VfyRnwMQ2D6cHdDrZhvvGOV3FURTPuO3a6f9AD2Eso1pIo6CA==}
     dev: false
 
+  /express-handlebars/6.0.6:
+    resolution: {integrity: sha512-E4QHYCh+9fyfdBEb8uKJ8p6HD4qq/sUSHBq83lRNlLJp2TQKEg2nFJYbVdC+M3QzaV19dODe43lgjQWVaIpbyQ==}
+    engines: {node: '>=v12.22.9'}
+    dependencies:
+      glob: 8.0.3
+      graceful-fs: 4.2.10
+      handlebars: 4.7.7
+    dev: false
+
   /express/4.17.3:
     resolution: {integrity: sha512-yuSQpz5I+Ch7gFrPCk4/c+dIBKlQUxtgwqzph132bsT6qhuzss6I8cLJQz7B3rFblzd6wtcI0ZbGltH/C4LjUg==}
     engines: {node: '>= 0.10.0'}
@@ -4184,6 +4224,17 @@ packages:
       path-is-absolute: 1.0.1
     dev: false
 
+  /glob/8.0.3:
+    resolution: {integrity: sha512-ull455NHSHI/Y1FqGaaYFaLGkNMMJbavMrEGFXG/PGrg6y7sutWHUHrz6gy6WEBH6akM1M414dWKCNs+IhKdiQ==}
+    engines: {node: '>=12'}
+    dependencies:
+      fs.realpath: 1.0.0
+      inflight: 1.0.6
+      inherits: 2.0.4
+      minimatch: 5.1.0
+      once: 1.4.0
+    dev: false
+
   /global-modules/1.0.0:
     resolution: {integrity: sha512-sKzpEkf11GpOFuw0Zzjzmt4B4UZwjOcG757PPvrfhxcLFbq0wpsgpOqxpxtxFiCG4DtG93M6XRVbF2oGdev7bg==}
     engines: {node: '>=0.10.0'}
@@ -4235,6 +4286,19 @@ packages:
   /graphql/15.8.0:
     resolution: {integrity: sha512-5gghUc24tP9HRznNpV2+FIoq3xKkj5dTQqf4v0CpdPbFVwFkWoxOM+o+2OC9ZSvjEMTjfmG9QT+gcvggTwW1zw==}
     engines: {node: '>= 10.x'}
+    dev: false
+
+  /handlebars/4.7.7:
+    resolution: {integrity: sha512-aAcXm5OAfE/8IXkcZvCepKU3VzW1/39Fb5ZuqMtgI/hT8X2YgoMvBY5dLhq/cpOvw7Lk1nK/UF71aLG/ZnVYRA==}
+    engines: {node: '>=0.4.7'}
+    hasBin: true
+    dependencies:
+      minimist: 1.2.6
+      neo-async: 2.6.2
+      source-map: 0.6.1
+      wordwrap: 1.0.0
+    optionalDependencies:
+      uglify-js: 3.16.2
     dev: false
 
   /has-bigints/1.0.2:
@@ -5576,6 +5640,13 @@ packages:
       brace-expansion: 1.1.11
     dev: false
 
+  /minimatch/5.1.0:
+    resolution: {integrity: sha512-9TPBGGak4nHfGZsPBohm9AWg6NoT7QTCehS3BIJABslyZbzxfV78QM2Y6+i741OPZIafFAaiiEMh5OyIrJPgtg==}
+    engines: {node: '>=10'}
+    dependencies:
+      brace-expansion: 2.0.1
+    dev: false
+
   /minimist/1.2.6:
     resolution: {integrity: sha512-Jsjnk4bw3YJqYzbdyBiNsPWHPfO++UGG749Cxs6peCu5Xg4nrena6OVxOYxrQTqww0Jmwt+Ref8rggumkTLz9Q==}
     dev: false
@@ -5717,6 +5788,10 @@ packages:
     engines: {node: '>= 0.6'}
     dev: false
 
+  /neo-async/2.6.2:
+    resolution: {integrity: sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==}
+    dev: false
+
   /nested-error-stacks/2.1.1:
     resolution: {integrity: sha512-9iN1ka/9zmX1ZvLV9ewJYEk9h7RyRRtqdK0woXcqohu8EWIerfPUjYJPg0ULy0UqP7cslmdGc8xKDJcojlKiaw==}
     dev: false
@@ -5766,6 +5841,17 @@ packages:
       cron-parser: 3.5.0
       long-timeout: 0.1.1
       sorted-array-functions: 1.3.0
+    dev: false
+
+  /nodemailer-express-handlebars/5.0.0:
+    resolution: {integrity: sha512-DMeoCr8kSyLjzXZR+wclDidPDcgy68mIiuSlDZeeDP4IQLJmRzXrlTv+3C2r+uYUnajN5vxqB8pTBdju6aH/yA==}
+    dependencies:
+      express-handlebars: 6.0.6
+    dev: false
+
+  /nodemailer/6.7.7:
+    resolution: {integrity: sha512-pOLC/s+2I1EXuSqO5Wa34i3kXZG3gugDssH+ZNCevHad65tc8vQlCQpOLaUjopvkRQKm2Cki2aME7fEOPRy3bA==}
+    engines: {node: '>=6.0.0'}
     dev: false
 
   /nodemon/2.0.19:
@@ -7425,6 +7511,13 @@ packages:
     hasBin: true
     dev: false
 
+  /uglify-js/3.16.2:
+    resolution: {integrity: sha512-AaQNokTNgExWrkEYA24BTNMSjyqEXPSfhqoS0AxmHkCJ4U+Dyy5AvbGV/sqxuxficEfGGoX3zWw9R7QpLFfEsg==}
+    engines: {node: '>=0.8.0'}
+    hasBin: true
+    dev: false
+    optional: true
+
   /unbox-primitive/1.0.2:
     resolution: {integrity: sha512-61pPlCD9h51VoreyJ0BReideM3MDKMKnh6+V9L08331ipq6Q8OFXZYiqP6n/tbHx4s5I9uRhcye6BrbkizkBDw==}
     dependencies:
@@ -7659,6 +7752,10 @@ packages:
     engines: {node: '>=0.10.0'}
     dev: false
 
+  /wordwrap/1.0.0:
+    resolution: {integrity: sha512-gvVzJFlPycKc5dZN4yPkP8w7Dc37BtP1yczEneOb4uq34pXZcvrtRTmWV8W+Ume+XCxKgbjM+nevkyFPMybd4Q==}
+    dev: false
+
   /wrap-ansi/7.0.0:
     resolution: {integrity: sha512-YVGIj2kamLSTxw6NsZjoBxfSwsn0ycdesmc4p+Q21c5zPuZ1pl+NfxVdxPtdHvmNVOQ6XSYG4AUtyt/Fi7D16Q==}
     engines: {node: '>=10'}
@@ -7817,6 +7914,80 @@ packages:
       - node-notifier
       - supports-color
       - ts-node
+      - utf-8-validate
+    dev: false
+
+  file:projects/notifications.tgz:
+    resolution: {integrity: sha512-SvGrCWhp6yCSPyP9DnphA9ryJKZFovJLksGZxPeSvrKuW4SoySk5KNDCCRgI+tev1eIax1wJ2eIhDoacyTwRZg==, tarball: file:projects/notifications.tgz}
+    name: '@rush-temp/notifications'
+    version: 0.0.0
+    dependencies:
+      '@datalust/winston-seq': 1.0.2_winston@3.3.4
+      '@opentelemetry/api': 1.0.4
+      '@opentelemetry/auto-instrumentations-node': 0.28.0_@opentelemetry+api@1.0.4
+      '@opentelemetry/exporter-jaeger': 1.0.1_@opentelemetry+api@1.0.4
+      '@opentelemetry/instrumentation': 0.27.0_@opentelemetry+api@1.0.4
+      '@opentelemetry/instrumentation-fetch': 0.27.0_@opentelemetry+api@1.0.4
+      '@opentelemetry/instrumentation-http': 0.27.0_@opentelemetry+api@1.0.4
+      '@opentelemetry/resources': 1.0.1_@opentelemetry+api@1.0.4
+      '@opentelemetry/sdk-node': 0.27.0_@opentelemetry+api@1.0.4
+      '@opentelemetry/sdk-trace-base': 1.0.1_@opentelemetry+api@1.0.4
+      '@opentelemetry/sdk-trace-node': 1.0.1_@opentelemetry+api@1.0.4
+      '@opentelemetry/semantic-conventions': 1.0.1
+      '@opentelemetry/shim-opentracing': 1.0.1_@opentelemetry+api@1.0.4
+      '@types/amqplib': 0.8.2
+      '@types/express': 4.17.13
+      '@types/jest': 27.0.3
+      '@types/jsonwebtoken': 8.5.8
+      '@types/node': 16.11.45
+      '@types/node-schedule': 1.3.2
+      '@types/nodemailer': 6.4.4
+      '@types/nodemailer-express-handlebars': 4.0.2
+      '@types/uuid': 8.3.4
+      '@typescript-eslint/eslint-plugin': 5.6.0_208b89671cba43a6bd6c40399b91183c
+      '@typescript-eslint/parser': 5.6.0_eslint@7.32.0+typescript@4.5.5
+      amqplib: 0.8.0
+      awilix: 6.0.0
+      celebrate: 15.0.1
+      dotenv: 10.0.0
+      eslint: 7.32.0
+      eslint-config-airbnb-typescript: 12.3.1_c27c76bc318784551b1ca1bf0c09dfe8
+      eslint-config-prettier: 8.3.0_eslint@7.32.0
+      eslint-plugin-import: 2.24.0_eslint@7.32.0
+      eslint-plugin-prettier: 4.0.0_6e6a25a49a944db0fa38418c3ba4bc86
+      eslint-plugin-unicorn: 39.0.0_eslint@7.32.0
+      express: 4.17.3
+      http-status: 1.5.2
+      husky: 7.0.4
+      jest: 27.4.7_ts-node@10.9.1
+      jsonwebtoken: 8.5.1
+      mongoose: 6.3.9
+      node-fetch: 2.6.7
+      nodemailer: 6.7.7
+      nodemailer-express-handlebars: 5.0.0
+      nodemon: 2.0.19
+      opentracing: 0.14.7
+      prettier: 2.5.1
+      pretty-quick: 3.1.3_prettier@2.5.1
+      prom-client: 14.0.1
+      prometheus-api-metrics: 3.2.2_prom-client@14.0.1
+      redis: 4.0.6
+      ts-node: 10.9.1_cb90aba627470f06b8655fe857e4815a
+      tsc-alias: 1.4.2
+      typescript: 4.5.5
+      uuid: 8.3.2
+      winston: 3.3.4
+    transitivePeerDependencies:
+      - '@swc/core'
+      - '@swc/wasm'
+      - bufferutil
+      - canvas
+      - encoding
+      - eslint-plugin-jsx-a11y
+      - eslint-plugin-react
+      - eslint-plugin-react-hooks
+      - node-notifier
+      - supports-color
       - utf-8-validate
     dev: false
 

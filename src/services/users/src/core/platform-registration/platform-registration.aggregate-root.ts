@@ -39,6 +39,7 @@ export class PlatformRegistration extends AggregateRoot<PlatformRegistrationProp
     platformRegistration.addDomainEvent(
       new NewAccountRegisteredEvent({
         accountId: platformRegistration.id.value,
+        accountEmail: platformRegistration.props.email.toString(),
       }),
     );
 
