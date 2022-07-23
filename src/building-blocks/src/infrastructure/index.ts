@@ -15,3 +15,5 @@ export * from './service-builder';
 export * from './service-client';
 
 export * from './message-broker';
+
+export * from './redis';

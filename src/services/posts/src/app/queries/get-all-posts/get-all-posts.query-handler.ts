@@ -23,6 +23,6 @@ export class GetAllPostsQueryHandler
 
     const data = posts.map((post) => post.toJSON()).splice((page - 1) * itemsPerPage, itemsPerPage);
 
-    return serializeDataToPaginatedResponse<RawPost>(data, data.length, page, itemsPerPage);
+    return serializeDataToPaginatedResponse<RawPost>(data, posts.length, page, itemsPerPage);
   }
 }

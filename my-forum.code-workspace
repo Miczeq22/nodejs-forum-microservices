@@ -17,9 +17,6 @@
       "path": "src/services/users"
     },
     {
-      "path": "src/services/identity"
-    },
-    {
       "path": "src/services/notifications"
     }
   ]

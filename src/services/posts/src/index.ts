@@ -8,6 +8,7 @@ import { InMemoryCategoryProvider } from '@infrastructure/category-provider/cate
 import { InMemoryPostRepository } from '@infrastructure/post/post.repository';
 import { MessageBroker, ServiceBuilder } from '@myforum/building-blocks';
 import { asClass } from 'awilix';
+import { RedisClientType } from 'redis';
 
 (async () => {
   const service = new ServiceBuilder()
@@ -26,6 +27,7 @@ import { asClass } from 'awilix';
       postRepository: asClass(InMemoryPostRepository).singleton(),
     })
     .useKafka()
+    .useRedis('redis://127.0.0.1:6379')
     .build();
 
   await service.bootstrap();
@@ -38,7 +40,10 @@ import { asClass } from 'awilix';
 
   await messageBroker.subscribeToTopics(['users']);
 
+  const redis = service.getContainer().resolve<RedisClientType>('redisClient');
+
   service.cleanUpOnExit(async () => {
     await messageBroker.disconnect();
+    await redis.disconnect();
   });
 })();

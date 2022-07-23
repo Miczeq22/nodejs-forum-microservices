@@ -10,6 +10,7 @@ import {
 } from 'awilix';
 import { Application } from 'express';
 import * as opentracing from 'opentracing';
+import { RedisClientType } from 'redis';
 import {
   CommandHandler,
   Controller,
@@ -27,6 +28,7 @@ import { TracerBuilder } from './tracer';
 import { ConsulServiceDiscovery, ServiceDiscovery } from './service-discovery';
 import { JwtTokenProviderService } from './token-provider';
 import { KafkaMessageBroker } from './message-broker/kafka/kafka.message-broker';
+import { redisClient } from './redis/redis.client';
 
 interface CustomResolution {
   [key: string]: Resolver<any>;
@@ -139,6 +141,14 @@ export class ServiceBuilder {
     return this;
   }
 
+  public useRedis(url: string) {
+    this.container.register({
+      redisClient: asValue(redisClient(url)),
+    });
+
+    return this;
+  }
+
   public useConsul(url: string) {
     this.container.register({
       serviceDiscovery: asClass(ConsulServiceDiscovery)
@@ -169,6 +179,23 @@ export class ServiceBuilder {
         this.container.register({
           server: asClass(Server).singleton(),
         });
+
+        if (this.container.hasRegistration('redisClient')) {
+          const resolvedRedisClient = this.container.resolve<RedisClientType>('redisClient');
+
+          resolvedRedisClient
+            .on('connect', () => {
+              resolvedLogger.info('[Cache Provider] Redis connected.');
+            })
+            .on('error', (error) => {
+              resolvedLogger.error('[Cache Provider] Redis connection failed.', error);
+            })
+            .on('end', () => {
+              resolvedLogger.info('[Cache Provider] Redis conenction closed.');
+            });
+
+          await resolvedRedisClient.connect();
+        }
 
         if (this.container.hasRegistration('messageBus')) {
           const messageBus = this.container.resolve<MessageBus>('messageBus');
@@ -238,10 +265,17 @@ export class ServiceBuilder {
   }
 
   private cleanUpOnExit(cleanup: () => Promise<void>) {
+    const resolvedLogger = this.container.resolve<Logger>('logger');
+
     // so the program will not close instantly
     process.stdin.resume();
 
     async function exitHandler(options, _exitCode) {
+      if (options.error) {
+        resolvedLogger.error(`Unhandled error occured: ${options.error.message}`);
+        resolvedLogger.error(options.error.stack);
+      }
+
       if (options.cleanup || options.exit) {
         await cleanup();
       }
@@ -260,7 +294,7 @@ export class ServiceBuilder {
     process.on('SIGUSR2', exitHandler.bind(null, { exit: true }));
 
     // catches uncaught exceptions
-    process.on('uncaughtException', exitHandler.bind(null, { exit: true }));
+    process.on('uncaughtException', (error) => exitHandler.call(null, { exit: true, error }));
   }
 
   private registerCommonDependenciesIfNotSet() {
