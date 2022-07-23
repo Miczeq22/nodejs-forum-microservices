@@ -4,4 +4,6 @@ export interface PostRepository {
   insert(post: Post): Promise<void>;
 
   findById(id: string): Promise<Post | null>;
+
+  findAll(): Promise<Post[]>;
 }

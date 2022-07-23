@@ -18,4 +18,8 @@ export class InMemoryPostRepository implements PostRepository {
 
     return Post.fromPersistence(existingPost);
   }
+
+  public async findAll(): Promise<Post[]> {
+    return this.posts.map(Post.fromPersistence);
+  }
 }
