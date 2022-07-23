@@ -7,7 +7,7 @@ interface Dependencies {
 }
 
 export class PostsManagementController implements Controller {
-  public readonly route = '/post-management';
+  public readonly route = '/v1/posts-management';
 
   constructor(private readonly dependencies: Dependencies) {}
 

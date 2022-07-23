@@ -1,14 +1,22 @@
-import { DomainEvent, ServiceBuilder, MessageBroker } from '@myforum/building-blocks';
-
-interface Payload {
-  id: number;
-  name: string;
-}
-
-class UserRegisteredEvent extends DomainEvent<Payload> {}
+import { RegisterNewAccountCommandHandler } from '@app/commands/register-new-account/register-new-account.command-handler';
+import { InMemoryAccountEmailChecker } from '@infrastructure/account-email-checker/account-email-checker.service';
+import { MessageBroker, ServiceBuilder } from '@myforum/building-blocks';
+import { PasswordHashProviderImpl } from '@infrastructure/password-hash-provider/password-hash-provider.service';
+import { asClass } from 'awilix';
+import { PlatformRegistrationController } from '@api/platform-registration/platform-registration.controller';
 
 (async () => {
-  const service = new ServiceBuilder().setName('users').useKafka().build();
+  const service = new ServiceBuilder()
+    .loadActions([`${__dirname}/**/*.action.ts`, `${__dirname}/**/*.action.js`])
+    .setCustom({
+      accountEmailChecker: asClass(InMemoryAccountEmailChecker).singleton(),
+      passwordHashProvider: asClass(PasswordHashProviderImpl).singleton(),
+    })
+    .setCommandHandlers([asClass(RegisterNewAccountCommandHandler).singleton()])
+    .setControllers([asClass(PlatformRegistrationController).singleton()])
+    .setName('users')
+    .useKafka()
+    .build();
 
   await service.bootstrap();
 
@@ -18,12 +26,7 @@ class UserRegisteredEvent extends DomainEvent<Payload> {}
 
   const messageBroker = service.getContainer().resolve<MessageBroker>('messageBroker');
 
-  await messageBroker.sendMessage(
-    'users',
-    new UserRegisteredEvent({
-      id: 1,
-      name: `John ${new Date().getTime()}`,
-    }),
-    '1',
-  );
+  service.cleanUpOnExit(async () => {
+    await messageBroker.disconnect();
+  });
 })();

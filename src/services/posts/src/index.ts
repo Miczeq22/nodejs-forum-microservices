@@ -2,31 +2,18 @@ import { PostCatalogueController } from '@api/post-catalogue/post-catalogue.cont
 import { PostsManagementController } from '@api/posts-management/posts-management.controller';
 import { CreateNewPostCommandHandler } from '@app/commands/create-new-post/create-new-post.command-handler';
 import { GetAllPostsQueryHandler } from '@app/queries/get-all-posts/get-all-posts.query-handler';
+import { NewAccountRegisteredSubscriber } from '@app/subscribers/users/new-account-registered/new-account-registered.subscriber';
 import { InMemoryAuthorProvider } from '@infrastructure/author-provider/author-provider.service';
 import { InMemoryCategoryProvider } from '@infrastructure/category-provider/category-provider.service';
 import { InMemoryPostRepository } from '@infrastructure/post/post.repository';
-import { MessageBroker, ServiceBuilder, EventSubscriber, Logger } from '@myforum/building-blocks';
+import { MessageBroker, ServiceBuilder } from '@myforum/building-blocks';
 import { asClass } from 'awilix';
-
-interface Dependencies {
-  logger: Logger;
-}
-
-class UserRegisteredSubscriber implements EventSubscriber<any> {
-  public readonly type = 'UserRegisteredEvent';
-
-  constructor(private readonly dependencies: Dependencies) {}
-
-  public async handle(event: any): Promise<void> {
-    this.dependencies.logger.info(`Received payload: ${JSON.stringify(event.payload)}`);
-  }
-}
 
 (async () => {
   const service = new ServiceBuilder()
     .setName('posts')
     .loadActions([`${__dirname}/**/*.action.ts`, `${__dirname}/**/*.action.js`])
-    .setEventSubscribers([asClass(UserRegisteredSubscriber).singleton()])
+    .setEventSubscribers([asClass(NewAccountRegisteredSubscriber).singleton()])
     .setCommandHandlers([asClass(CreateNewPostCommandHandler).singleton()])
     .setQueryHandlers([asClass(GetAllPostsQueryHandler).singleton()])
     .setControllers([

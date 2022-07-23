@@ -6,7 +6,7 @@ interface Dependencies {
 }
 
 export class PostCatalogueController implements Controller {
-  public readonly route = '/posts';
+  public readonly route = '/v1/posts';
 
   constructor(private readonly dependencies: Dependencies) {}
 
