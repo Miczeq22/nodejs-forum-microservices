@@ -50,6 +50,10 @@ export class PlatformRegistration extends AggregateRoot<PlatformRegistrationProp
     return this.id;
   }
 
+  public getPasswordHash() {
+    return this.props.password.getHash();
+  }
+
   public toJSON() {
     return {
       id: this.id.value,

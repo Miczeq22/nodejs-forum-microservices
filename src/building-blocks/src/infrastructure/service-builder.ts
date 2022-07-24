@@ -11,6 +11,7 @@ import {
 import { Application } from 'express';
 import * as opentracing from 'opentracing';
 import { RedisClientType } from 'redis';
+import openApiJsDoc from 'swagger-jsdoc';
 import { authMiddleware } from '@api/middlewares/auth/auth.middleware';
 import {
   CommandHandler,
@@ -34,6 +35,33 @@ import { redisClient } from './redis/redis.client';
 interface CustomResolution {
   [key: string]: Resolver<any>;
 }
+
+const openApiOptions = {
+  swaggerDefinition: {
+    openapi: '3.0.1',
+    info: {
+      title: 'MyForum - Node.js Microservices & DDD API',
+      version: '0.0.1',
+      description: 'This is API for MyForum - Node.js Microservices & DDD API.',
+    },
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: 'apiKey',
+          in: 'header',
+          name: 'x-auth-token',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+        },
+      },
+    },
+    security: [
+      {
+        bearerAuth: [],
+      },
+    ],
+  },
+};
 
 export class ServiceBuilder {
   private serviceName: string;
@@ -132,6 +160,19 @@ export class ServiceBuilder {
     return this;
   }
 
+  public useOpenApi(apiUrls: string[]) {
+    const openApiDocs = openApiJsDoc({
+      ...openApiOptions,
+      apis: apiUrls,
+    });
+
+    this.container.register({
+      openApiDocs: asValue(openApiDocs),
+    });
+
+    return this;
+  }
+
   public useRabbitMQ(url: string) {
     this.container.register({
       messageBus: asClass(RabbitMqMessageBus)
@@ -179,6 +220,17 @@ export class ServiceBuilder {
         this.registerCommonDependenciesIfNotSet();
 
         resolvedLogger.info('Loading service dependencies...');
+
+        if (!this.container.hasRegistration('openApiDocs')) {
+          this.container.register({
+            openApiDocs: asValue(
+              openApiJsDoc({
+                ...openApiOptions,
+                apis: [],
+              }),
+            ),
+          });
+        }
 
         this.container.register({
           server: asClass(Server).singleton(),

@@ -3,6 +3,7 @@ import { InMemoryAccountEmailChecker } from '@infrastructure/account-email-check
 import { MessageBroker, ServiceBuilder } from '@myforum/building-blocks';
 import { PasswordHashProviderImpl } from '@infrastructure/password-hash-provider/password-hash-provider.service';
 import { asClass } from 'awilix';
+import path from 'path';
 import { PlatformRegistrationController } from '@api/platform-registration/platform-registration.controller';
 import { InMemoryAccountRepository } from '@infrastructure/account/in-memory-account.repository';
 import { InMemoryPlatformRegistrationRepository } from '@infrastructure/platform-registration/in-memory-platform-registration.repository';
@@ -30,6 +31,12 @@ import { PlatformAccessController } from '@api/platform-access/platform-access.c
     .setName('users')
     .useRedis('redis://127.0.0.1:6379')
     .useKafka()
+    .useOpenApi([
+      path.join(__dirname, 'api', '**', '*.action.ts'),
+      path.join(__dirname, 'api', '**', '*.action.js'),
+      path.join(__dirname, 'api', '**', '*.schema.ts'),
+      path.join(__dirname, 'api', '**', '*.schema.js'),
+    ])
     .build();
 
   await service.bootstrap();

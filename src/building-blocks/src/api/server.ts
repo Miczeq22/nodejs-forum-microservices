@@ -1,6 +1,7 @@
 import express, { Application } from 'express';
 import apiMetrics from 'prometheus-api-metrics';
 import status from 'http-status';
+import * as swaggerUI from 'swagger-ui-express';
 import { NotFoundError } from '@errors/index';
 import { Controller } from './controller';
 import corsMiddleware from './middlewares/cors/cors.middleware';
@@ -11,6 +12,7 @@ import { Logger } from '..';
 interface Dependencies {
   controllers: Controller[];
   logger: Logger;
+  openApiDocs: object;
 }
 
 export class Server {
@@ -34,6 +36,8 @@ export class Server {
     this.dependencies.controllers.forEach((controller) =>
       this.app.use(controller.route, controller.getRouter()),
     );
+
+    this.app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(this.dependencies.openApiDocs));
 
     this.app.use('*', (req, _, next) => {
       next(new NotFoundError(`Route "${req.originalUrl}" is not supported.`));
