@@ -11,6 +11,7 @@ import {
 import { Application } from 'express';
 import * as opentracing from 'opentracing';
 import { RedisClientType } from 'redis';
+import { authMiddleware } from '@api/middlewares/auth/auth.middleware';
 import {
   CommandHandler,
   Controller,
@@ -45,6 +46,9 @@ export class ServiceBuilder {
     this.container.register({
       logger: asValue(logger(name)),
       tokenProvider: asClass(JwtTokenProviderService).singleton(),
+      authMiddleware: asFunction(authMiddleware, {
+        lifetime: Lifetime.SCOPED,
+      }),
     });
 
     const tracerBuilder = new TracerBuilder(name).build();
