@@ -1,4 +1,4 @@
-import { Tracer } from 'opentracing';
+import { FORMAT_HTTP_HEADERS, SpanContext, Tags, Tracer } from 'opentracing';
 import { NotFoundError, Logger } from '..';
 import { Command } from './command';
 import { CommandBus } from './command-bus';
@@ -12,6 +12,7 @@ interface Dependencies {
   commandHandlers: CommandHandler<any, any>[];
   tracer: Tracer;
   logger: Logger;
+  spanContext: SpanContext;
 }
 
 export class InMemoryCommandBus implements CommandBus {
@@ -30,7 +31,18 @@ export class InMemoryCommandBus implements CommandBus {
   }
 
   public async handle(command: Command<any>): Promise<unknown> {
-    const { logger } = this.dependencies;
+    const { logger, tracer, spanContext } = this.dependencies;
+
+    const context = tracer.extract(FORMAT_HTTP_HEADERS, spanContext);
+
+    const span = tracer.startSpan(
+      `[Command Bus] Handling command${command.constructor.name.replace(/([A-Z])/g, ' $1')}.`,
+      {
+        childOf: context,
+      },
+    );
+
+    span.setTag(Tags.COMPONENT, 'command-bus');
 
     const existingCommandHandler =
       this.existingCommandHandlers[this.getCommandHandlerName(command)];
@@ -48,6 +60,8 @@ export class InMemoryCommandBus implements CommandBus {
     } catch (error) {
       logger.error(`[Command Bus] Can't process command: ${command.constructor.name}.`, error);
       throw error;
+    } finally {
+      span.finish();
     }
   }
 

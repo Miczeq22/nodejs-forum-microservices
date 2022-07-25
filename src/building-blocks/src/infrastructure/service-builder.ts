@@ -77,6 +77,7 @@ export class ServiceBuilder {
       authMiddleware: asFunction(authMiddleware, {
         lifetime: Lifetime.SCOPED,
       }),
+      container: asValue(this.container),
     });
 
     const tracerBuilder = new TracerBuilder(name).build();
@@ -88,6 +89,7 @@ export class ServiceBuilder {
     this.container.register({
       tracer: asValue(tracer),
       tracingMiddleware: asFunction(tracingMiddleware),
+      spanContext: asValue(null),
     });
 
     return this;

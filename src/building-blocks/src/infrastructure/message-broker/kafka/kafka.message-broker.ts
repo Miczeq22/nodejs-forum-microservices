@@ -2,6 +2,7 @@ import { EventSubscriber } from '@app/event-subscriber';
 import { DomainEvent } from '@core/domain-event';
 import { Logger } from '@infrastructure/logger';
 import Kafka from 'kafka-node';
+import { FORMAT_HTTP_HEADERS, Span, SpanContext, Tags, Tracer } from 'opentracing';
 import { MessageBroker } from '../message-broker';
 
 interface Dependencies {
@@ -9,6 +10,7 @@ interface Dependencies {
   eventSubscribers: EventSubscriber<any>[];
   logger: Logger;
   serviceName: string;
+  tracer: Tracer;
 }
 
 export class KafkaMessageBroker implements MessageBroker {
@@ -41,7 +43,12 @@ export class KafkaMessageBroker implements MessageBroker {
     topics.forEach(this.subscribeToTopic.bind(this));
   }
 
-  public async sendMessage(topic: string, event: DomainEvent<object>, key: string): Promise<void> {
+  public async sendMessage(
+    topic: string,
+    event: DomainEvent<object>,
+    key: string,
+    spanContext: SpanContext,
+  ): Promise<void> {
     if (!this.producers.has(topic)) {
       const producer = new Kafka.Producer(this.client);
 
@@ -58,6 +65,7 @@ export class KafkaMessageBroker implements MessageBroker {
           messages: JSON.stringify({
             payload: event.payload,
             type: event.constructor.name,
+            spanContext,
           }),
         },
       ],
@@ -87,6 +95,8 @@ export class KafkaMessageBroker implements MessageBroker {
   }
 
   private subscribeToTopic(topic: string) {
+    const { tracer } = this.dependencies;
+
     if (!this.consumers.has(topic)) {
       const consumer = new Kafka.ConsumerGroup(
         {
@@ -101,12 +111,30 @@ export class KafkaMessageBroker implements MessageBroker {
 
     const consumer = this.consumers.get(topic);
 
-    consumer.on('message', (message) => {
-      const { type, payload } = JSON.parse(message.value as string);
+    consumer.on('message', async (message) => {
+      const { type, payload, spanContext } = JSON.parse(message.value as string);
 
-      this.dependencies.eventSubscribers
+      let span: Span | null = null;
+
+      if (spanContext) {
+        const context = tracer.extract(FORMAT_HTTP_HEADERS, spanContext);
+
+        span = tracer.startSpan(`[Event Subscriber] Handling event ${type}.`, {
+          childOf: context,
+        });
+
+        span.setTag(Tags.COMPONENT, 'event-subscriber');
+      }
+
+      const promises = this.dependencies.eventSubscribers
         .filter((eventSubscriber) => eventSubscriber.type === type)
         .map((eventSubscriber) => eventSubscriber.handle(new DomainEvent(payload)));
+
+      await Promise.all(promises).finally(() => {
+        if (span) {
+          span.finish();
+        }
+      });
     });
   }
 }

@@ -1,4 +1,4 @@
-import express, { Application } from 'express';
+import express, { Application, RequestHandler } from 'express';
 import apiMetrics from 'prometheus-api-metrics';
 import status from 'http-status';
 import * as swaggerUI from 'swagger-ui-express';
@@ -13,6 +13,7 @@ interface Dependencies {
   controllers: Controller[];
   logger: Logger;
   openApiDocs: object;
+  tracingMiddleware: RequestHandler;
 }
 
 export class Server {
@@ -28,6 +29,8 @@ export class Server {
     applySecurityMiddleware(this.app);
 
     this.app.use(apiMetrics());
+
+    this.app.use(this.dependencies.tracingMiddleware);
 
     this.app.get('/health', (_, res) => {
       res.sendStatus(status.OK);

@@ -3,6 +3,7 @@ import { PlatformRegistrationRepository } from '@core/platform-registration/plat
 import { AccountEmailChecker } from '@core/shared-kernel/account-email/account-email-checker.service';
 import { PasswordHashProvider } from '@core/shared-kernel/account-password/password-hash-provider.service';
 import { CommandHandler, MessageBroker, TokenProviderService } from '@myforum/building-blocks';
+import { SpanContext } from 'opentracing';
 import { RegisterNewAccountCommand } from './register-new-account.command';
 
 interface Dependencies {
@@ -11,6 +12,7 @@ interface Dependencies {
   messageBroker: MessageBroker;
   platformRegistrationRepository: PlatformRegistrationRepository;
   tokenProvider: TokenProviderService;
+  spanContext: SpanContext;
 }
 
 interface RegisterNewAccountCommandResult {
@@ -32,6 +34,7 @@ export class RegisterNewAccountCommandHandler
       messageBroker,
       platformRegistrationRepository,
       tokenProvider,
+      spanContext,
     } = this.dependencies;
 
     const account = await PlatformRegistration.registerNewAccount(payload, {
@@ -43,7 +46,9 @@ export class RegisterNewAccountCommandHandler
 
     const eventsToDispatchPromises = account
       .getDomainEvents()
-      .map((event) => messageBroker.sendMessage('users', event, account.getId().value));
+      .map((event) =>
+        messageBroker.sendMessage('users', event, account.getId().value, spanContext),
+      );
 
     await Promise.all(eventsToDispatchPromises);
 
