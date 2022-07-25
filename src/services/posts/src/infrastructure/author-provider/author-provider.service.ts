@@ -1,12 +1,25 @@
 import { AuthorProvider } from '@core/shared-kernel/author-provider/author-provider.service';
-import { AuthorStatus } from '@core/shared-kernel/author-status/author-status.value-object';
 import { Author } from '@core/shared-kernel/author/author.entity';
+import { RedisClientType } from 'redis';
+
+interface Dependencies {
+  redisClient: RedisClientType;
+}
 
 export class InMemoryAuthorProvider implements AuthorProvider {
-  public async getById(): Promise<Author> {
-    return Author.fromPersistence({
-      id: 'effce917-00e9-4fc2-9c00-02a69d294249',
-      status: AuthorStatus.Active.getValue(),
-    });
+  private readonly CACHE_PREFIX = 'USERS_';
+
+  constructor(private readonly dependencies: Dependencies) {}
+
+  public async getById(id: string): Promise<Author> {
+    const { redisClient } = this.dependencies;
+
+    const existingAuthor = await redisClient.get(`${this.CACHE_PREFIX}${id}`);
+
+    if (!existingAuthor) {
+      return null;
+    }
+
+    return Author.fromPersistence(JSON.parse(existingAuthor));
   }
 }

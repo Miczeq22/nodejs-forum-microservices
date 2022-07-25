@@ -4,7 +4,7 @@ import { createNewPostActionValidation } from './actions/create-new-post.action'
 
 interface Dependencies {
   createNewPostAction: RequestHandler;
-  authMiddleware: RequestHandler;
+  getUserContextMiddleware: RequestHandler;
 }
 
 export class PostsManagementController implements Controller {
@@ -16,7 +16,7 @@ export class PostsManagementController implements Controller {
     const router = Router();
 
     router.post('/', [
-      this.dependencies.authMiddleware,
+      this.dependencies.getUserContextMiddleware,
       createNewPostActionValidation,
       this.dependencies.createNewPostAction,
     ]);

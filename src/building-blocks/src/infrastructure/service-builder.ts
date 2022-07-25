@@ -22,6 +22,7 @@ import {
   QueryHandler,
   ServiceController,
   tracingMiddleware,
+  getUserContextMiddleware,
 } from '..';
 import { registerAsArray } from './container';
 import { Logger, logger } from './logger';
@@ -75,6 +76,9 @@ export class ServiceBuilder {
       logger: asValue(logger(name)),
       tokenProvider: asClass(JwtTokenProviderService).singleton(),
       authMiddleware: asFunction(authMiddleware, {
+        lifetime: Lifetime.SCOPED,
+      }),
+      getUserContextMiddleware: asFunction(getUserContextMiddleware, {
         lifetime: Lifetime.SCOPED,
       }),
       container: asValue(this.container),

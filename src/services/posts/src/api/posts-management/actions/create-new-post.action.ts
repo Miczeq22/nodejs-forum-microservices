@@ -45,7 +45,7 @@ const createNewPostAction =
   ({ commandBus }: Dependencies): RequestHandler =>
   (req, res, next) =>
     commandBus
-      .handle(new CreateNewPostCommand({ ...req.body, authorId: '#author-id' }))
+      .handle(new CreateNewPostCommand({ ...req.body, authorId: res.locals.context.accountId }))
       .then((post) => res.status(201).json(post))
       .catch(next);
 
