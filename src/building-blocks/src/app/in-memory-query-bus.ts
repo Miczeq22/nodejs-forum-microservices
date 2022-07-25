@@ -46,24 +46,39 @@ export class InMemoryQueryBus implements QueryBus {
     const existingQueryHandler = this.existingQueryHandlers[this.getQueryHandlerName(query)];
 
     if (!existingQueryHandler) {
-      span.finish();
-      span.setTag(
-        Tags.ERROR,
-        new NotFoundError(
-          `Query Handler for query: "${this.getConstructorName(query)}" does not exist.`,
-        ),
-      );
-
-      throw new NotFoundError(
+      const error = new NotFoundError(
         `Query Handler for query: "${this.getConstructorName(query)}" does not exist.`,
       );
+
+      span.setTag(Tags.ERROR, true);
+      span.log({
+        event: 'error',
+        'error.object': error,
+        message: error.message,
+        stack: error.stack,
+      });
+
+      span.finish();
+
+      throw error;
     }
 
-    const result = await existingQueryHandler.handle(query);
+    try {
+      return await existingQueryHandler.handle(query);
+    } catch (error) {
+      span.setTag(Tags.ERROR, true);
 
-    span.finish();
+      span.log({
+        event: 'error',
+        'error.object': error,
+        message: error.message,
+        stack: error.stack,
+      });
 
-    return result;
+      throw error;
+    } finally {
+      span.finish();
+    }
   }
 
   private getConstructorName(object: object) {

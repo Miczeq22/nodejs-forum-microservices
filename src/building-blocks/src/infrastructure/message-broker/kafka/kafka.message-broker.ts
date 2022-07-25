@@ -119,22 +119,38 @@ export class KafkaMessageBroker implements MessageBroker {
       if (spanContext) {
         const context = tracer.extract(FORMAT_HTTP_HEADERS, spanContext);
 
-        span = tracer.startSpan(`[Event Subscriber] Handling event ${type}.`, {
-          childOf: context,
-        });
+        span = tracer.startSpan(
+          `[Event Subscriber] Handling event ${type.replace(/([A-Z])/g, ' $1')}.`,
+          {
+            childOf: context,
+          },
+        );
 
         span.setTag(Tags.COMPONENT, 'event-subscriber');
       }
 
-      const promises = this.dependencies.eventSubscribers
+      this.dependencies.eventSubscribers
         .filter((eventSubscriber) => eventSubscriber.type === type)
-        .map((eventSubscriber) => eventSubscriber.handle(new DomainEvent(payload)));
-
-      await Promise.all(promises).finally(() => {
-        if (span) {
-          span.finish();
-        }
-      });
+        .map((eventSubscriber) =>
+          eventSubscriber
+            .handle(new DomainEvent(payload))
+            .catch((error) => {
+              if (span) {
+                span.setTag(Tags.ERROR, true);
+                span.log({
+                  event: 'error',
+                  'error.object': error,
+                  message: error.message,
+                  stack: error.stack,
+                });
+              }
+            })
+            .finally(() => {
+              if (span) {
+                span.finish();
+              }
+            }),
+        );
     });
   }
 }

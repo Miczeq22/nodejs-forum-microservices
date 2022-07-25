@@ -48,9 +48,22 @@ export class InMemoryCommandBus implements CommandBus {
       this.existingCommandHandlers[this.getCommandHandlerName(command)];
 
     if (!existingCommandHandler) {
-      throw new NotFoundError(
+      const error = new NotFoundError(
         `Command Handler for command: "${this.getConstructorName(command)}" does not exist.`,
       );
+
+      span.setTag(Tags.ERROR, true);
+
+      span.log({
+        event: 'error',
+        'error.object': error,
+        message: error.message,
+        stack: error.stack,
+      });
+
+      span.finish();
+
+      throw error;
     }
 
     try {
@@ -59,6 +72,16 @@ export class InMemoryCommandBus implements CommandBus {
       return result;
     } catch (error) {
       logger.error(`[Command Bus] Can't process command: ${command.constructor.name}.`, error);
+
+      span.setTag(Tags.ERROR, true);
+
+      span.log({
+        event: 'error',
+        'error.object': error,
+        message: error.message,
+        stack: error.stack,
+      });
+
       throw error;
     } finally {
       span.finish();
