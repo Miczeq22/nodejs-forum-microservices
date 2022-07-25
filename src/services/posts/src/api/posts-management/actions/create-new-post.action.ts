@@ -20,6 +20,27 @@ export const createNewPostActionValidation = celebrate(
   },
 );
 
+/**
+ * @openapi
+ *
+ * /v1/posts-management:
+ *   post:
+ *     tags:
+ *        - Posts
+ *     summary:
+ *       This endpoint allows to create new post.
+ *     responses:
+ *       201:
+ *        description: Post created successfully.
+ *       400:
+ *        description: Business Rule Error
+ *       401:
+ *        description: Unauthorized
+ *       422:
+ *        description: Validation Error
+ *       500:
+ *         description: Internal Server Error
+ */
 const createNewPostAction =
   ({ commandBus }: Dependencies): RequestHandler =>
   (req, res, next) =>

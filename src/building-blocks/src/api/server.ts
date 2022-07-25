@@ -37,7 +37,11 @@ export class Server {
       this.app.use(controller.route, controller.getRouter()),
     );
 
-    this.app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(this.dependencies.openApiDocs));
+    if (this.dependencies.openApiDocs !== null) {
+      this.app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(this.dependencies.openApiDocs));
+
+      this.app.use('/openapi.json', (_, res) => res.json(this.dependencies.openApiDocs));
+    }
 
     this.app.use('*', (req, _, next) => {
       next(new NotFoundError(`Route "${req.originalUrl}" is not supported.`));

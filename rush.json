@@ -395,6 +395,10 @@
     {
       "packageName": "@myforum/notifications",
       "projectFolder": "src/services/notifications"
+    },
+    {
+      "packageName": "@myforum/api-gateway",
+      "projectFolder": "src/api-gateway"
     }
   ]
 }

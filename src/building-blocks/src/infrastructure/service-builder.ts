@@ -223,12 +223,7 @@ export class ServiceBuilder {
 
         if (!this.container.hasRegistration('openApiDocs')) {
           this.container.register({
-            openApiDocs: asValue(
-              openApiJsDoc({
-                ...openApiOptions,
-                apis: [],
-              }),
-            ),
+            openApiDocs: asValue(null),
           });
         }
 

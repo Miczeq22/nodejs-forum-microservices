@@ -8,6 +8,7 @@ import { InMemoryCategoryProvider } from '@infrastructure/category-provider/cate
 import { InMemoryPostRepository } from '@infrastructure/post/post.repository';
 import { MessageBroker, ServiceBuilder } from '@myforum/building-blocks';
 import { asClass } from 'awilix';
+import path from 'path';
 import { RedisClientType } from 'redis';
 
 (async () => {
@@ -28,6 +29,12 @@ import { RedisClientType } from 'redis';
     })
     .useKafka()
     .useRedis('redis://127.0.0.1:6379')
+    .useOpenApi([
+      path.join(__dirname, 'api', '**', '*.action.ts'),
+      path.join(__dirname, 'api', '**', '*.action.js'),
+      path.join(__dirname, 'api', '**', '*.schema.ts'),
+      path.join(__dirname, 'api', '**', '*.schema.js'),
+    ])
     .build();
 
   await service.bootstrap();
