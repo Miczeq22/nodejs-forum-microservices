@@ -10,14 +10,14 @@ import { HttpInstrumentation } from '@opentelemetry/instrumentation-http';
 export class TracerBuilder {
   private provider: NodeTracerProvider;
 
-  constructor(serviceName: string) {
+  constructor(serviceName: string, url: string = '') {
     this.provider = new NodeTracerProvider({
       resource: new Resource({
         [SemanticResourceAttributes.SERVICE_NAME]: serviceName,
       }),
     });
 
-    this.provider.addSpanProcessor(new BatchSpanProcessor(this.getExporter()));
+    this.provider.addSpanProcessor(new BatchSpanProcessor(this.getExporter(url)));
 
     registerInstrumentations({
       tracerProvider: this.provider,
@@ -31,7 +31,9 @@ export class TracerBuilder {
     return new TracerShim(this.provider.getTracer('opentracing-shim'));
   }
 
-  private getExporter() {
-    return new JaegerExporter();
+  private getExporter(url: string) {
+    return new JaegerExporter({
+      endpoint: url,
+    });
   }
 }

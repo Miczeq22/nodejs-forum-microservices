@@ -7,7 +7,7 @@ interface Dependencies {
   commandBus: CommandBus;
 }
 
-export const createNewPostActionValidation = celebrate(
+export const createNewPostActionValidation: RequestHandler = celebrate(
   {
     [Segments.BODY]: Joi.object().keys({
       title: Joi.string().trim().required(),

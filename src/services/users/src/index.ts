@@ -10,6 +10,11 @@ import { InMemoryPlatformRegistrationRepository } from '@infrastructure/platform
 import { RedisClientType } from 'redis';
 import { LoginCommandHandler } from '@app/commands/login/login.command-handler';
 import { PlatformAccessController } from '@api/platform-access/platform-access.controller';
+import { config } from 'dotenv';
+
+config({
+  path: '../../../.env',
+});
 
 (async () => {
   const service = new ServiceBuilder()
@@ -28,9 +33,9 @@ import { PlatformAccessController } from '@api/platform-access/platform-access.c
       asClass(PlatformRegistrationController).singleton(),
       asClass(PlatformAccessController).singleton(),
     ])
-    .setName('users')
-    .useRedis('redis://127.0.0.1:6379')
-    .useKafka()
+    .setName('users', process.env.JAEGER_ENDPOINT)
+    .useRedis(process.env.REDIS_URL)
+    .useKafka(process.env.KAFKA_URL)
     .useOpenApi([
       path.join(__dirname, 'api', '**', '*.action.ts'),
       path.join(__dirname, 'api', '**', '*.action.js'),
@@ -41,7 +46,7 @@ import { PlatformAccessController } from '@api/platform-access/platform-access.c
 
   await service.bootstrap();
 
-  const port = 4500;
+  const port = Number(process.env.USERS_APP_PORT) || 4000;
 
   await service.listen(port);
 

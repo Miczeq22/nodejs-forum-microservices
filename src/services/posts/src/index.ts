@@ -10,10 +10,15 @@ import { MessageBroker, ServiceBuilder } from '@myforum/building-blocks';
 import { asClass } from 'awilix';
 import path from 'path';
 import { RedisClientType } from 'redis';
+import { config } from 'dotenv';
+
+config({
+  path: '../../../.env',
+});
 
 (async () => {
   const service = new ServiceBuilder()
-    .setName('posts')
+    .setName('posts', process.env.JAEGER_ENDPOINT)
     .loadActions([`${__dirname}/**/*.action.ts`, `${__dirname}/**/*.action.js`])
     .setEventSubscribers([asClass(NewAccountRegisteredSubscriber).singleton()])
     .setCommandHandlers([asClass(CreateNewPostCommandHandler).singleton()])
@@ -27,8 +32,8 @@ import { RedisClientType } from 'redis';
       categoryProvider: asClass(InMemoryCategoryProvider).singleton(),
       postRepository: asClass(InMemoryPostRepository).singleton(),
     })
-    .useKafka()
-    .useRedis('redis://127.0.0.1:6379')
+    .useKafka(process.env.KAFKA_URL)
+    .useRedis(process.env.REDIS_URL)
     .useOpenApi([
       path.join(__dirname, 'api', '**', '*.action.ts'),
       path.join(__dirname, 'api', '**', '*.action.js'),
@@ -39,7 +44,7 @@ import { RedisClientType } from 'redis';
 
   await service.bootstrap();
 
-  const port = Number(process.env.APP_PORT) || 4000;
+  const port = Number(process.env.POSTS_APP_PORT) || 4000;
 
   await service.listen(port);
 

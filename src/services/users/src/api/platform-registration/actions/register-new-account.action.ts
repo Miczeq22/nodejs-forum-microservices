@@ -8,7 +8,7 @@ interface Dependencies {
   commandBus: CommandBus;
 }
 
-export const registerNewAccountActionValidation = celebrate(
+export const registerNewAccountActionValidation: RequestHandler = celebrate(
   {
     [Segments.BODY]: Joi.object<RegisterNewAccountPayload>().keys({
       email: Joi.string().email().required(),

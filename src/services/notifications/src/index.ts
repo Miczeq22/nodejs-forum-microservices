@@ -5,22 +5,23 @@ import { asClass } from 'awilix';
 import { config } from 'dotenv';
 
 config({
-  path: '../../.env',
+  path: '../../../.env',
 });
 
 (async () => {
   const service = new ServiceBuilder()
-    .setName('notifications')
+    .setName('notifications', process.env.JAEGER_ENDPOINT)
     .setCustom({
       mailer: asClass(InMemoryMailer).singleton(),
     })
     .setEventSubscribers([asClass(NewAccountRegisteredSubscriber).singleton()])
-    .useKafka()
+    .useKafka(process.env.KAFKA_URL)
+    .useRedis(process.env.REDIS_URL)
     .build();
 
   await service.bootstrap();
 
-  const port = Number(process.env.APP_PORT) || 5300;
+  const port = Number(process.env.NOTIFICATIONS_APP_PORT) || 5300;
 
   await service.listen(port);
 

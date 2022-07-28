@@ -6,6 +6,8 @@ services:
     container_name: zookeeper
     ports:
       - 2181:2181
+    networks:
+      - my-forum
 
   kafka:
     image: wurstmeister/kafka
@@ -15,6 +17,8 @@ services:
     environment:
       KAFKA_ADVERTISED_HOST_NAME: localhost
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+    networks:
+      - my-forum
 
   redis:
     image: redis
@@ -24,6 +28,8 @@ services:
       - 6379:6379
     volumes:
       - ./data/redis:/data
+    networks:
+      - my-forum
 
   jaeger:
     image: jaegertracing/all-in-one
@@ -36,3 +42,9 @@ services:
       - 9411:9411
       - 14268:14268
       - 16686:16686
+    networks:
+      - my-forum
+
+networks:
+  my-forum:
+

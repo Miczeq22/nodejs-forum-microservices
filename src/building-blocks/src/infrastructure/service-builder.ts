@@ -69,7 +69,7 @@ export class ServiceBuilder {
 
   private container: AwilixContainer = createContainer();
 
-  public setName(name: string) {
+  public setName(name: string, url: string = '') {
     this.serviceName = name;
 
     this.container.register({
@@ -84,7 +84,7 @@ export class ServiceBuilder {
       container: asValue(this.container),
     });
 
-    const tracerBuilder = new TracerBuilder(name).build();
+    const tracerBuilder = new TracerBuilder(name, url).build();
 
     opentracing.initGlobalTracer(tracerBuilder);
 
@@ -153,11 +153,11 @@ export class ServiceBuilder {
     return this;
   }
 
-  public useKafka() {
+  public useKafka(url: string) {
     this.container.register({
       messageBroker: asClass(KafkaMessageBroker)
         .inject(() => ({
-          url: 'localhost:9092',
+          url,
           serviceName: this.serviceName,
         }))
         .singleton(),

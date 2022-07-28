@@ -7,7 +7,7 @@ interface Dependencies {
   commandBus: CommandBus;
 }
 
-export const loginActionValidation = celebrate(
+export const loginActionValidation: RequestHandler = celebrate(
   {
     [Segments.BODY]: Joi.object<LoginCommandPayload>().keys({
       email: Joi.string().trim().email().required(),

@@ -1,0 +1,64 @@
+version: '3.5'
+
+services:
+  users-ms:
+    container_name: users-ms
+    build: 
+      context: ../.
+      dockerfile: ./src/services/users/docker/Dockerfile
+    ports:
+      - 4500:4500
+    environment:
+      REDIS_URL: redis://redis:6379
+      JAEGER_ENDPOINT: http://jaeger:14268/api/traces
+      KAFKA_URL: kafka:9092
+      APP_PORT: 4500
+    networks:
+      - my-forum
+    depends_on:
+      - kafka
+      - redis
+      - zookeeper
+      - jaeger
+
+  posts-ms:
+    container_name: posts-ms
+    build: 
+      context: ../.
+      dockerfile: ./src/services/posts/docker/Dockerfile
+    ports:
+      - 4000:4000
+    environment:
+      REDIS_URL: redis://redis:6379
+      JAEGER_ENDPOINT: http://jaeger:14268/api/traces
+      KAFKA_URL: kafka:9092
+      APP_PORT: 4000
+    networks:
+      - my-forum
+    depends_on:
+      - kafka
+      - redis
+      - zookeeper
+      - jaeger
+      - users-ms
+
+  notifications-ms:
+    container_name: notifications-ms
+    build: 
+      context: ../.
+      dockerfile: ./src/services/notifications/docker/Dockerfile
+    ports:
+      - 4700:4700
+    environment:
+      REDIS_URL: redis://redis:6379
+      JAEGER_ENDPOINT: http://jaeger:14268/api/traces
+      KAFKA_URL: kafka:9092
+      APP_PORT: 4700
+    networks:
+      - my-forum
+    depends_on:
+      - kafka
+      - redis
+      - zookeeper
+      - jaeger
+      - users-ms

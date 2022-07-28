@@ -129,28 +129,38 @@ export class KafkaMessageBroker implements MessageBroker {
         span.setTag(Tags.COMPONENT, 'event-subscriber');
       }
 
-      this.dependencies.eventSubscribers
-        .filter((eventSubscriber) => eventSubscriber.type === type)
-        .map((eventSubscriber) =>
-          eventSubscriber
-            .handle(new DomainEvent(payload))
-            .catch((error) => {
-              if (span) {
-                span.setTag(Tags.ERROR, true);
-                span.log({
-                  event: 'error',
-                  'error.object': error,
-                  message: error.message,
-                  stack: error.stack,
-                });
-              }
-            })
-            .finally(() => {
-              if (span) {
-                span.finish();
-              }
-            }),
-        );
+      await Promise.all(
+        this.dependencies.eventSubscribers
+          .filter((eventSubscriber) => eventSubscriber.type === type)
+          .map((eventSubscriber) =>
+            eventSubscriber
+              .handle(new DomainEvent(payload))
+              .catch((error) => {
+                if (span) {
+                  span.setTag(Tags.ERROR, true);
+                  span.log({
+                    event: 'error',
+                    'error.object': error,
+                    message: error.message,
+                    stack: error.stack,
+                  });
+                }
+              })
+              .finally(() => {
+                if (span) {
+                  span.finish();
+                }
+              }),
+          ),
+      );
+    });
+
+    consumer.on('error', (error) => {
+      this.dependencies.logger.error(
+        '[Kafka] Error occurred while connecting to message broker.',
+        error,
+      );
+      this.dependencies.logger.error(error.stack);
     });
   }
 }
