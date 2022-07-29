@@ -12,14 +12,9 @@ services:
       REDIS_URL: redis://redis:6379
       JAEGER_ENDPOINT: http://jaeger:14268/api/traces
       KAFKA_URL: kafka:9092
-      APP_PORT: 4500
+      USERS_APP_PORT: 4500
     networks:
       - my-forum
-    depends_on:
-      - kafka
-      - redis
-      - zookeeper
-      - jaeger
 
   posts-ms:
     container_name: posts-ms
@@ -32,14 +27,10 @@ services:
       REDIS_URL: redis://redis:6379
       JAEGER_ENDPOINT: http://jaeger:14268/api/traces
       KAFKA_URL: kafka:9092
-      APP_PORT: 4000
+      POSTS_APP_PORT: 4000
     networks:
       - my-forum
     depends_on:
-      - kafka
-      - redis
-      - zookeeper
-      - jaeger
       - users-ms
 
   notifications-ms:
@@ -53,12 +44,32 @@ services:
       REDIS_URL: redis://redis:6379
       JAEGER_ENDPOINT: http://jaeger:14268/api/traces
       KAFKA_URL: kafka:9092
-      APP_PORT: 4700
+      NOTIFICATIONS_APP_PORT: 4700
     networks:
       - my-forum
     depends_on:
-      - kafka
-      - redis
-      - zookeeper
-      - jaeger
       - users-ms
+
+  api-gateway:
+    container_name: api-gateway
+    build: 
+      context: ../.
+      dockerfile: ./src/api-gateway/docker/Dockerfile
+    ports:
+      - 7500:7500
+    environment:
+      REDIS_URL: redis://redis:6379
+      JAEGER_ENDPOINT: http://jaeger:14268/api/traces
+      KAFKA_URL: kafka:9092
+      API_GATEWAY_APP_PORT: 7500
+      POSTS_MS_URL: http://posts-ms:4000
+      USERS_MS_URL: http://users-ms:4500
+    networks:
+      - my-forum
+    depends_on:
+      - users-ms
+      - posts-ms
+      - notifications-ms
+
+networks:
+  my-forum:

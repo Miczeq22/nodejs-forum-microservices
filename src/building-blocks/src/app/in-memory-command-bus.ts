@@ -1,3 +1,4 @@
+import { asValue, AwilixContainer } from 'awilix';
 import { FORMAT_HTTP_HEADERS, SpanContext, Tags, Tracer } from 'opentracing';
 import { NotFoundError, Logger } from '..';
 import { Command } from './command';
@@ -13,6 +14,7 @@ interface Dependencies {
   tracer: Tracer;
   logger: Logger;
   spanContext: SpanContext;
+  container: AwilixContainer;
 }
 
 export class InMemoryCommandBus implements CommandBus {
@@ -31,7 +33,7 @@ export class InMemoryCommandBus implements CommandBus {
   }
 
   public async handle(command: Command<any>): Promise<unknown> {
-    const { logger, tracer, spanContext } = this.dependencies;
+    const { logger, tracer, spanContext, container } = this.dependencies;
 
     const context = tracer.extract(FORMAT_HTTP_HEADERS, spanContext);
 
@@ -61,6 +63,14 @@ export class InMemoryCommandBus implements CommandBus {
         stack: error.stack,
       });
 
+      const newContext = {};
+
+      tracer.inject(span.context(), FORMAT_HTTP_HEADERS, newContext);
+
+      container.register({
+        spanContext: asValue(newContext),
+      });
+
       span.finish();
 
       throw error;
@@ -80,6 +90,14 @@ export class InMemoryCommandBus implements CommandBus {
         'error.object': error,
         message: error.message,
         stack: error.stack,
+      });
+
+      const newContext = {};
+
+      tracer.inject(span.context(), FORMAT_HTTP_HEADERS, newContext);
+
+      container.register({
+        spanContext: asValue(newContext),
       });
 
       throw error;

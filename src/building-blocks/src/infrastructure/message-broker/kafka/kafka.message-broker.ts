@@ -1,6 +1,7 @@
 import { EventSubscriber } from '@app/event-subscriber';
 import { DomainEvent } from '@core/domain-event';
 import { Logger } from '@infrastructure/logger';
+import { asValue, AwilixContainer } from 'awilix';
 import Kafka from 'kafka-node';
 import { FORMAT_HTTP_HEADERS, Span, SpanContext, Tags, Tracer } from 'opentracing';
 import { MessageBroker } from '../message-broker';
@@ -11,6 +12,7 @@ interface Dependencies {
   logger: Logger;
   serviceName: string;
   tracer: Tracer;
+  container: AwilixContainer;
 }
 
 export class KafkaMessageBroker implements MessageBroker {
@@ -95,7 +97,7 @@ export class KafkaMessageBroker implements MessageBroker {
   }
 
   private subscribeToTopic(topic: string) {
-    const { tracer } = this.dependencies;
+    const { tracer, container } = this.dependencies;
 
     if (!this.consumers.has(topic)) {
       const consumer = new Kafka.ConsumerGroup(
@@ -127,6 +129,14 @@ export class KafkaMessageBroker implements MessageBroker {
         );
 
         span.setTag(Tags.COMPONENT, 'event-subscriber');
+
+        const newContext = {};
+
+        tracer.inject(span.context(), FORMAT_HTTP_HEADERS, newContext);
+
+        container.register({
+          spanContext: asValue(newContext),
+        });
       }
 
       await Promise.all(

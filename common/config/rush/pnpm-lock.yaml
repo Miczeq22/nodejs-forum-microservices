@@ -49,6 +49,7 @@ specifiers:
   eslint-plugin-unicorn: ~39.0.0
   express: ~4.17.3
   express-enforces-ssl: ~1.1.0
+  express-http-proxy: ~1.6.3
   helmet: ~5.1.0
   hpp: ~0.2.3
   http-status: ~1.5.1
@@ -125,6 +126,7 @@ dependencies:
   eslint-plugin-unicorn: 39.0.0_eslint@7.32.0
   express: 4.17.3
   express-enforces-ssl: 1.1.0
+  express-http-proxy: 1.6.3
   helmet: 5.1.1
   hpp: 0.2.3
   http-status: 1.5.2
@@ -1863,6 +1865,12 @@ packages:
     resolution: {integrity: sha512-DSzaERLO4gHb8AqnrL58jzSDyT0yDdl6HqDc+bGz1Hf0nrG1FK30nHGzv8NBEGR8QV9eUGB/YaE0Qj3NjF7siw==}
     dev: false
 
+  /@types/express-http-proxy/1.6.3:
+    resolution: {integrity: sha512-dX3+Cb0HNPtqhC5JUWzzuODHRlgJRZx7KvwKVVwkOvm+8vOtpsh3qy8+qLv5X1hs4vdVHWKyXf86DwJot5H8pg==}
+    dependencies:
+      '@types/express': 4.17.13
+    dev: false
+
   /@types/express-serve-static-core/4.17.29:
     resolution: {integrity: sha512-uMd++6dMKS32EOuw1Uli3e3BPgdLIXmezcfHv7N4c1s3gkhikBplORPpMq3fuWkxncZN1reb16d5n8yhQ80x7Q==}
     dependencies:
@@ -3485,6 +3493,10 @@ packages:
       is-symbol: 1.0.4
     dev: false
 
+  /es6-promise/4.2.8:
+    resolution: {integrity: sha512-HJDGx5daxeIvxdBxvG2cb9g4tEvwIk3i8+nhX0yGrYmZUzbkdg8QbDevheDB8gd0//uPj4c1EQua8Q+MViT0/w==}
+    dev: false
+
   /escalade/3.1.1:
     resolution: {integrity: sha512-k0er2gUkLf8O0zKJiAhmkTnJlTvINGv7ygDNPbeIsX/TJjGJZHuh9B2UxbsaEkmlEo9MfhrSzmhIlhRlI2GXnw==}
     engines: {node: '>=6'}
@@ -3887,6 +3899,15 @@ packages:
       glob: 8.0.3
       graceful-fs: 4.2.10
       handlebars: 4.7.7
+    dev: false
+
+  /express-http-proxy/1.6.3:
+    resolution: {integrity: sha512-/l77JHcOUrDUX8V67E287VEUQT0lbm71gdGVoodnlWBziarYKgMcpqT7xvh/HM8Jv52phw8Bd8tY+a7QjOr7Yg==}
+    engines: {node: '>=6.0.0'}
+    dependencies:
+      debug: 3.2.7
+      es6-promise: 4.2.8
+      raw-body: 2.4.3
     dev: false
 
   /express/4.17.3:
@@ -8008,7 +8029,7 @@ packages:
     dev: false
 
   file:projects/api-gateway.tgz:
-    resolution: {integrity: sha512-LVbmIfvZHPzratBA7R5erL6Zc36NhJ7bXBvm0tx73TcDlNG/kjamXLXSmVmPjrcjMh0TP07nmv7QJWQiJFJ8xw==, tarball: file:projects/api-gateway.tgz}
+    resolution: {integrity: sha512-LLNvJPew7BXLT36btj2+F+zP1BgQY/OUMOZoCiuSPC5lUbnjYRHsTaysQhfliLkAHoN1/d0l7aDbrzHZDXD/ug==, tarball: file:projects/api-gateway.tgz}
     name: '@rush-temp/api-gateway'
     version: 0.0.0
     dependencies:
@@ -8027,6 +8048,7 @@ packages:
       '@opentelemetry/shim-opentracing': 1.0.1_@opentelemetry+api@1.0.4
       '@types/amqplib': 0.8.2
       '@types/express': 4.17.13
+      '@types/express-http-proxy': 1.6.3
       '@types/jest': 27.0.3
       '@types/jsonwebtoken': 8.5.8
       '@types/node': 16.11.45
@@ -8048,6 +8070,7 @@ packages:
       eslint-plugin-prettier: 4.0.0_6e6a25a49a944db0fa38418c3ba4bc86
       eslint-plugin-unicorn: 39.0.0_eslint@7.32.0
       express: 4.17.3
+      express-http-proxy: 1.6.3
       http-status: 1.5.2
       husky: 7.0.4
       jest: 27.4.7_ts-node@10.9.1

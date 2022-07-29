@@ -22,6 +22,16 @@ export const tracingMiddleware =
       span.setTag(Tags.HTTP_URL, req.originalUrl);
       span.setTag(Tags.COMPONENT, 'action');
 
+      const newContext = {};
+
+      tracer.inject(span.context(), FORMAT_HTTP_HEADERS, newContext);
+
+      container.register({
+        spanContext: asValue(newContext),
+      });
+
+      span.finish();
+
       return next();
     }
 
