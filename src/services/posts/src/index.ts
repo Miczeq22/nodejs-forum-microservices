@@ -11,6 +11,7 @@ import { asClass } from 'awilix';
 import path from 'path';
 import { RedisClientType } from 'redis';
 import { config } from 'dotenv';
+import { GetSinglePostQueryHandler } from '@app/queries/get-single-post/get-single-post.query-handler';
 
 config({
   path: '../../../.env',
@@ -22,7 +23,10 @@ config({
     .loadActions([`${__dirname}/**/*.action.ts`, `${__dirname}/**/*.action.js`])
     .setEventSubscribers([asClass(NewAccountRegisteredSubscriber).singleton()])
     .setCommandHandlers([asClass(CreateNewPostCommandHandler).singleton()])
-    .setQueryHandlers([asClass(GetAllPostsQueryHandler).singleton()])
+    .setQueryHandlers([
+      asClass(GetAllPostsQueryHandler).singleton(),
+      asClass(GetSinglePostQueryHandler).singleton(),
+    ])
     .setControllers([
       asClass(PostsManagementController).singleton(),
       asClass(PostCatalogueController).singleton(),

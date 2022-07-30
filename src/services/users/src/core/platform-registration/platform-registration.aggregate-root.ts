@@ -31,7 +31,8 @@ export class PlatformRegistration extends AggregateRoot<PlatformRegistrationProp
       password: await AccountPassword.createNew(password, {
         passwordHashProvider,
       }),
-      status: AccountStatus.AccountNotConfirmed,
+      // TODO: Set to non-active when e-mail confirmation is ready
+      status: AccountStatus.Active,
       registeredAt: new Date(),
       accountConfirmedAt: null,
     });

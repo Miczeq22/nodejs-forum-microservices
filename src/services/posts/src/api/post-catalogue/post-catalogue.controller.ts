@@ -3,6 +3,7 @@ import { RequestHandler, Router } from 'express';
 
 interface Dependencies {
   getAllPostsAction: RequestHandler;
+  getSinglePostAction: RequestHandler;
 }
 
 export class PostCatalogueController implements Controller {
@@ -14,6 +15,8 @@ export class PostCatalogueController implements Controller {
     const router = Router();
 
     router.get('/', this.dependencies.getAllPostsAction);
+
+    router.get('/:id', this.dependencies.getSinglePostAction);
 
     return router;
   }
