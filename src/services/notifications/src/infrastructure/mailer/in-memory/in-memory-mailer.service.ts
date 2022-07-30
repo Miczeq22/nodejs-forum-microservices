@@ -11,7 +11,7 @@ export class InMemoryMailer implements Mailer {
 
   private initTransporter() {
     this.transporter = createTransport({
-      host: process.env.MAILHOG_HOST,
+      host: process.env.SMTP_HOST,
       port: Number(process.env.SMTP_PORT),
     });
 
