@@ -12,6 +12,8 @@ import path from 'path';
 import { RedisClientType } from 'redis';
 import { config } from 'dotenv';
 import { GetSinglePostQueryHandler } from '@app/queries/get-single-post/get-single-post.query-handler';
+import { InMemoryPostCatalogueRepository } from '@infrastructure/post-catalogue/post/post.repository';
+import { AddNewCommentCommandHandler } from '@app/commands/add-new-comment/add-new-comment.command-handler';
 
 config({
   path: '../../../.env',
@@ -22,7 +24,10 @@ config({
     .setName('posts', process.env.JAEGER_ENDPOINT)
     .loadActions([`${__dirname}/**/*.action.ts`, `${__dirname}/**/*.action.js`])
     .setEventSubscribers([asClass(NewAccountRegisteredSubscriber).singleton()])
-    .setCommandHandlers([asClass(CreateNewPostCommandHandler).singleton()])
+    .setCommandHandlers([
+      asClass(CreateNewPostCommandHandler).singleton(),
+      asClass(AddNewCommentCommandHandler).singleton(),
+    ])
     .setQueryHandlers([
       asClass(GetAllPostsQueryHandler).singleton(),
       asClass(GetSinglePostQueryHandler).singleton(),
@@ -35,6 +40,7 @@ config({
       authorProvider: asClass(InMemoryAuthorProvider).singleton(),
       categoryProvider: asClass(InMemoryCategoryProvider).singleton(),
       postRepository: asClass(InMemoryPostRepository).singleton(),
+      postCatalogueRepository: asClass(InMemoryPostCatalogueRepository).singleton(),
     })
     .useKafka(process.env.KAFKA_URL)
     .useRedis(process.env.REDIS_URL)
